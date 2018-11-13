@@ -1,0 +1,176 @@
+Asciidoc(tor)                              
+=============
+Collonville Thomas                                     
+Version 0.1.0-SNAPSHOT, 13/11/2018                                             
+
+:sectnums:                                                          
+:toc:                                                               
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation de Asciidoc                              
+:keywords: AsciiDoc                                                 
+:imagesdir: ./img                                                   
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+Redaction documentaire
+----------------------
+Constat
+~~~~~~~
+* Penible
+* Indispensable
+
+Outils
+~~~~~~
+* WYSIWYG ou presque (Word, OpenOffice, etc...)
+* Markdown
+* Latex
+
+Installation
+------------
+Prerequis
+~~~~~~~~~
+* Python 2.7
+* Sourceforge
+
+Utilisation
+~~~~~~~~~~~
+* faire un alias 
+
+	alias ascdoc="/cygdrive/c/Python27/python.exe C:/Tools/asciidoc-8.6.9/asciidoc.py"
+	
+* exemple
+
+	ascdoc -d article -b slidy test.adoc
+
+Un exemple
+----------
+
+.....................................................................
+Asciidoc(tor)                              
+=============
+Collonville Thomas                                     
+Version 0.1.0-SNAPSHOT, 13/11/2018                                             
+
+:sectnums:                                                          
+:toc:                                                               
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation de Asciidoc                              
+:keywords: AsciiDoc                                                 
+:imagesdir: ./img                                                   
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+Redaction documentaire
+----------------------
+Constat
+~~~~~~~
+* Penible
+* Indispensable
+
+Outils
+~~~~~~
+* WYSIWYG ou presque (Word, OpenOffice, etc...)
+* Markdown
+* Latex
+.....................................................................
+
+Un autre
+--------
+
+.....................................................................
+= Asciidoc(tor)                              
+Collonville Thomas                                     
+Version 0.1.0-SNAPSHOT, 13/11/2018                                             
+
+:sectnums:                                                          
+:toc:                                                               
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation de Asciidoc                              
+:keywords: AsciiDoc                                                 
+:imagesdir: ./img                                                   
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+== Redaction documentaire
+===Constat
+
+* Penible
+* Indispensable
+
+===Outils
+* WYSIWYG ou presque (Word, OpenOffice, etc...)
+* Markdown
+* Latex
+.....................................................................
+
+Un peu de syntaxe
+-----------------
+
+* Asciidoc est souple et accepte differents type de syntaxe
+* Chapitre et section -> voir exemple precedent
+* mise en forme liste telle que:
+
+.....................................................................
+* *en gras*
+* _emphasis_
+* `mono`
+.....................................................................
+
+* *en gras*
+* _emphasis_
+* `mono`
+
+Encore peu de syntaxe
+---------------------
+
+Importation de code sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* (sans le #)
+
+.....................................................................
+#include::code/source.java[]
+.....................................................................
+
+* Resultat
+
+---------------------
+include::code/source.java[]
+---------------------
+
+Encore peu de syntaxe
+---------------------
+
+Importation d\'images
+~~~~~~~~~~~~~~~~~~~~
+
+.....................................................................
+image::MagrittePipe.jpg[La Trahison des images, René Magritte]
+.....................................................................
+
+image::MagrittePipe.jpg[La Trahison des images - René Magritte]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
