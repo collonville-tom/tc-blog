@@ -248,10 +248,10 @@ Mesure de la performance
 * Calcul du cout
 ** Ratio des bonnes reponses par rapport au mauvaise
 
-* (2 echantillons de 2000 anana et 2000 pasteques)
-* pas de pasteques: 71  
+* (2 echantillons de 2000 ananas et 2000 pasteques)
+* ne sont pas des pasteques: 71  
 ** taux de reussite : 96.49824912456228
-* qui sont des ananas: 1815 
+* sont des ananas: 1815 
 ** taux de reussite : 90.79539769884943
 
 
@@ -273,8 +273,11 @@ Interpretation
 * (jeux de données de 4000 elements)
 * 1938 Vrai Positif 
 * 1798 Vrai Négatif 
-* 62 Faux Négatif 
-* 202 Faux Positif 
+* risque alpha ou erreur de premiere espece
+** 202 Faux Positif 
+* risque beta ou erreur de seconde espece
+** 62 Faux Négatif 
+
 
 Precision et rappel
 ~~~~~~~~~~~~~~~~~~~
@@ -354,9 +357,11 @@ Resultat
 * 15 données indécidables
 * 471 pasteques qui sont bien des pasquetes!
 * 452 ananas qui sont bien des ananas!
-* risque alpha erreur ou erreur de premiere espece
+
+* risque alpha ou erreur de premiere espece
 ** 22 ananas qui se prennent pour des pastèques 
-* risque beta erreur ou erreur de seconde espece
+
+* risque beta ou erreur de seconde espece
 ** 40 pasteques qui se prennent pour des ananas
 
 
@@ -416,15 +421,141 @@ image::MAE.png[]
 Apprentissage
 ~~~~~~~~~~~~~
 
+image::correctionPoids.png[]
+
 * Descente de gradient
+
+image::deriveMAE.png[]
+
+MAE implantation
+~~~~~~~~~~~~~~~~
+
+[source,java]
+---------------
+public Double MAE(Set<Data> datasSet)
+{
+    Double eccartAbsolue=datasSet.stream()
+            .map(x ->x.input[0]*Math.abs( this.linearInfer(x.input)-(x.output)))
+            .reduce((x,y) -> x+y).get();
+    System.out.println("Calcul MAE : "+eccartAbsolue/datasSet.size());
+    return eccartAbsolue/datasSet.size();
+}
+---------------
+
+MAE derivée partielle
+~~~~~~~~~~~~~~~~~~~~~
+
+[source,java]
+---------------
+public Double MAEpente(Set<Data> datasSet)
+{
+    Double eccartAbsolue=datasSet.stream()
+            .map(x ->x.input[0]*( this.linearInfer(x.input)-(x.output)))
+            .reduce((x,y) -> x+y).get();
+    System.out.println("Calcul MAEpentre : "+eccartAbsolue/datasSet.size());
+    return eccartAbsolue/datasSet.size();
+}
+
+public Double MAEbiais(Set<Data> datasSet)
+{
+    Double eccartAbsolue=datasSet.stream()
+            .map(x ->(  this.linearInfer(x.input)-(x.output)))
+            .reduce((x,y) -> x+y).get();
+    System.out.println("Calcul MAEbiais : "+eccartAbsolue/datasSet.size());
+    return eccartAbsolue/datasSet.size();
+}
+---------------
+
+Apprentissage
+~~~~~~~~~~~~~
+
+[source,java]
+---------------
+public void learnStep(Set<Data> datasSet)
+{
+    Double MAEpente=this.MAEpente(datasSet);
+    Double MAEbiais=this.MAEbiais(datasSet);
+    maeDescent.append(dendrites[0]).append("\t")
+            .append(dendrites[1]).append("\t").append(MAEpente).append("\t").append(MAEbiais).append("\n");
+    dendrites[0] = dendrites[0] - ammortissement*MAEpente;
+    dendrites[1] = dendrites[1] - 1000*ammortissement*MAEbiais;
+    ammortissement=ammortissement/1.01;
+}
+---------------
+
+Carte de performance
+~~~~~~~~~~~~~~~~~~~~
+
+* etape de visualisation
+* exploration de l'espace des parametres
+* evaluation du cout (MAE)
+
+Exemples de regression 
+----------------------
+
+* Cas de l'identification de parametres
+* Cas de regression
+
+Identification
+~~~~~~~~~~~~~~
+
+image::droite.png[800,600]
+
+Identification : resultat
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::evolSimple.png[800,600]
+
+Identification : perf
+~~~~~~~~~~~~~~~~~~~~~
+
+image::maeAngle.png[800,600]
+
+Identification (gradient)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::plansup.png[800,600]
+
+Regression (cas 1)
+~~~~~~~~~~~~~~~~~~
+
+image::droiteBruite.png[800,600]
+
+Regression (resultat)
+~~~~~~~~~~~~~~~~~~~~~
+
+image::evolSimple2.png[800,600]
+
+Regression (cas 2)
+~~~~~~~~~~~~~~~~~~
+
+image::donneeDispersee.png[800,600]
+
+Regression (resultat)
+~~~~~~~~~~~~~~~~~~~~~
+
+image::poorDataEvol.png[800,600]
+
+Regression (perf????)
+~~~~~~~~~~~~~~~~~~~~~
+
+image::vallee.png[800,600]
+
+Regression (Bonus Stage)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::carteOscillation.png[800,600]
+
+Regression (Bonus Stage)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::oscillation.png[800,600]
 
 Conclusion
 ----------
 
 * Un neurone ne fait pas un cerveau
  
- mais
-
 * On a besoin d'un cerveau pour comprendre le neurone
 
 
