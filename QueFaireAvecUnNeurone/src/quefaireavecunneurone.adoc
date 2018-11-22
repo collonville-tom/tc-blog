@@ -14,6 +14,9 @@ Version 0.1.0-SNAPSHOT, 20/11/2018
 [quote, Robert Heinlein]
 When one teach, two learn
 
+[TIP]
+Ou un peu d'espoir pour certains d'entre nous...
+
 Sommaire
 --------
 * Qu'est ce que l'IA
@@ -26,7 +29,7 @@ Sommaire
 Qu'est ce que l'IA
 ------------------
 
-image::IAdecoupe.png[]
+image::IAdecoupe.png[800,600]
 
 Historique
 ----------
@@ -79,7 +82,7 @@ Le neurone
 Le neurone biologique
 ~~~~~~~~~~~~~~~~~~~~~
 
-image::Neurone.png[]
+image::Neurone.png[800,600]
 
 Constitution
 ~~~~~~~~~~~~
@@ -118,7 +121,7 @@ image::modeleMatriciel.png[]
 Le neurone formel
 ~~~~~~~~~~~~~~~~~
 
-image::ModeleNeurone.png[]
+image::ModeleNeurone.png[800,600]
 
 La fonction d'activation
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -126,17 +129,17 @@ La fonction d'activation
 Lineaire
 ~~~~~~~~
 
-image::lineaire.png[]
+image::lineaire.png[800,600]
 
 Sigmoire
 ~~~~~~~~
 
-image::sigmoide.png[]
+image::sigmoide.png[800,600]
 
 Limiteur
 ~~~~~~~~
 
-image::limiteur.png[]
+image::limiteur.png[800,600]
 
 Processus
 ---------
@@ -154,15 +157,21 @@ Processus
 Exemples
 --------
 
+* Problemes de classification
+* Approche Linéaire
+* Approche Sigmoide
+* Probleme de regression
+* Approche Linéaire
+
+
 Probleme de tri
-~~~~~~~~~~~~~~~
+---------------
 
 image::ProblemeClassification.png[]
 * a rugosité -> 0 lisse a 1 rugeux
 * la couleur -> 0 bleu a 1 rouge
 * la forme -> 0 rond a 1 alongé
 * le poid -> 0 (20gr) à 1 (2000gr)
-
 
 Les données
 ~~~~~~~~~~~
@@ -185,17 +194,43 @@ Les données
 ---------------
 pasteque=np.array([[0.2, 0.3, 0.2, 0.95]])
 anana=np.array([[0.8, 0.65, 0.6, 0.8]])
-pasteques=generateSet(pasteque,1999,4)# -> pour separer les ensembles
-ananas=generateSet(anana,1999,4)
+
+pasteques=generateSet(pasteque,1999,10)
+ananas=generateSet(anana,1999,10)
+# 10 -> pour separer les ensembles
 ---------------
 
 Les données
 ~~~~~~~~~~~
 
-image::donnePastequeAnana.png[]
+image::donnePastequeAnana.png[800,600]
+
+Profil moyen
+~~~~~~~~~~~~
+
+ pastèque [0.2, 0.3, 0.2, 0.95] 
+ anana [0.8, 0.65, 0.6, 0.8] 
 
 La classification lineaire
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
+
+Solution adhoc
+~~~~~~~~~~~~~~
+
+* W=[1;1;1;0]
+* biais 1,5
+
+* Verification analytique
+** limiteur((Wt.pasteque)-biais)= limiteur( 0.4- 1.5)= limiteur(-1.1 )= 0
+** limiteur((Wt.anana)-biais)= limiteur( 2.35- 1.5)= limiteur(0.85 )= 1
+
+Pourquoi ca marche
+~~~~~~~~~~~~~~~~~~
+
+image::setWithVect.png[800,600]
+
+Solution logicielle
+~~~~~~~~~~~~~~~~~~~
 
 [source,python]
 ---------------
@@ -207,11 +242,165 @@ def neuroneLim(entre,W,biais):
     return 0
 ---------------
 
+Mesure de la performance
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Calcul du cout
+** Ratio des bonnes reponses par rapport au mauvaise
+
+* (2 echantillons de 2000 anana et 2000 pasteques)
+* pas de pasteques: 71  
+** taux de reussite : 96.49824912456228
+* qui sont des ananas: 1815 
+** taux de reussite : 90.79539769884943
+
+
+Superposition
+~~~~~~~~~~~~~
+
+image::donnePastequeAnanaNonSepare.png[800,600]
+
+Outil plus precis?
+
+Matrice de confusion
+~~~~~~~~~~~~~~~~~~~~
+
+image::matConf.png[]
+
+Interpretation
+~~~~~~~~~~~~~~
+
+* 1938 Vrai Positif 
+* 1798 Vrai Négatif 
+* 62 Faux Négatif 
+* 202 Faux Positif 
+
+Precision et rappel
+~~~~~~~~~~~~~~~~~~~
+
+* Précision : VP/(VP+FP)= 1938/(1938+202) = 0.90 
+** capacité à détecter des pastèques en présence d’ananas 
+** 0.90 de chance que le modèle réponde que le fruit est un ananas
+* Rappel ou sensibilité : VP/(VP+FN)= 1938/(1938+62) =0.97 
+** capacité à réellement détecter une pastèque dans un ensemble ne contenant que de pastèques
+
+Apprentissage
+~~~~~~~~~~~~~
+
+* supervisés -> on indique la bonne reponse
+* non supervisé -> le modele interprete la reponse (approche par clustering)
+* semi-supervisé
+
+ si etiquete - sortie > 0 alors W=W+data 
+ si etiquete - sortie < 0 alors W=W-data
+ si etiquete - sortie = 0 alors W
+
+Apprentissage
+~~~~~~~~~~~~~
+
+[source,python]
+---------------
+def majW(W, sortie, etiquette,entree):
+    return W+(etiquette-sortie)*entree
+
+for (val,etiquete) in datasApprentissage:
+    sortie=neuroneLim(val,W,biais)
+    W=majW(W, sortie, etiquete,val)
+---------------
+
+Test de l'apprentissage
+~~~~~~~~~~~~~~~~~~~~~~~
+
+[source,python]
+---------------
+for (val,etiquete) in datasTest:
+    sortie=neuroneLim(val,W,biais)
+    #print(sortie,etiquete)
+    if sortie != etiquete:
+        erreur.append(erreur[len(erreur)-1]+1)
+    else:
+        erreur.append(erreur[len(erreur)-1])
+---------------
+
+Test de l'apprentissage
+~~~~~~~~~~~~~~~~~~~~~~~
+
+image::tauxerreru.png[800,600]
+
 La classification sigmoide
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
+
+Modele Sigmoide
+~~~~~~~~~~~~~~~
+
+[source,python]
+---------------
+def neuroneCore(entre,W,biais):
+    return np.dot(entre,W.T)-biais
+
+def sigmoid(a):
+    return 1 / (1 + math.exp(-a))
+    
+def neuroneSig(entre,W,biais):
+    a=neuroneCore(entre,W,biais)
+    return sigmoid(a)
+---------------
+
+Resultat
+~~~~~~~~
+
+
+* 15 données indécidables
+* 471 pasteques qui sont bien des pasquetes!
+* 452 ananas qui sont bien des ananas!
+* risque alpha erreur ou erreur de premiere espece
+** 22 ananas qui se prennent pour des pastèques 
+* risque beta erreur ou erreur de seconde espece
+** 40 pasteques qui se prennent pour des ananas
+
+
+Interpretation
+~~~~~~~~~~~~~~
+
+image::datasSig.png[800,600]
 
 La regression lineaire
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
+
+Problematique
+~~~~~~~~~~~~~
+
+image::donnéesBruite.png[800,600]
+
+Estimateur
+~~~~~~~~~~
+
+image::estimateurLineaire.png[]
+
+ Equation Normale
+
+image::equationNormale.png[]
+
+Inference
+~~~~~~~~~
+
+[source,java]
+---------------
+public Double linearInfer(Double[] stepInputs)
+{
+    Stream.Builder<Double> sum=Stream.<Double>builder();
+    for(int i=0;i<dendrites.length;i++)
+    {
+        if(i<stepInputs.length)
+            sum.add(dendrites[i]*stepInputs[i]);
+        else
+            sum.add(dendrites[i]);
+    }
+    return sum.build().reduce((x,y)-> x+y).get();;
+}
+---------------
+
+
 
 Conclusion
 ----------
