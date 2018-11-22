@@ -58,7 +58,7 @@ Non-supervisé
 * Foret aléatoire 
 * Clustering et réduction de dimension 
 * SVD 
-* Analyse par composante principale (a noyau ou non) 
+* Analyse par composante principale
 * Règles
 
 Supervisé
@@ -270,6 +270,7 @@ image::matConf.png[]
 Interpretation
 ~~~~~~~~~~~~~~
 
+* (jeux de données de 4000 elements)
 * 1938 Vrai Positif 
 * 1798 Vrai Négatif 
 * 62 Faux Négatif 
@@ -291,9 +292,9 @@ Apprentissage
 * non supervisé -> le modele interprete la reponse (approche par clustering)
 * semi-supervisé
 
- si etiquete - sortie > 0 alors W=W+data 
- si etiquete - sortie < 0 alors W=W-data
- si etiquete - sortie = 0 alors W
+* si etiquete - sortie > 0 alors W=W+data 
+* si etiquete - sortie < 0 alors W=W-data
+* si etiquete - sortie = 0 alors W
 
 Apprentissage
 ~~~~~~~~~~~~~
@@ -349,7 +350,7 @@ def neuroneSig(entre,W,biais):
 Resultat
 ~~~~~~~~
 
-
+* (jeux de données de 1000 elements)
 * 15 données indécidables
 * 471 pasteques qui sont bien des pasquetes!
 * 452 ananas qui sont bien des ananas!
@@ -370,7 +371,7 @@ La regression lineaire
 Problematique
 ~~~~~~~~~~~~~
 
-image::donnéesBruite.png[800,600]
+image::donneesBruite.png[800,600]
 
 Estimateur
 ~~~~~~~~~~
@@ -400,13 +401,31 @@ public Double linearInfer(Double[] stepInputs)
 }
 ---------------
 
+Performance
+~~~~~~~~~~~
 
+* MSE : Mean Square Error
+* RMSE: Root Mean Square Error
+
+image::MSE.png[]
+
+* MAE : Mean Absolute Error
+
+image::MAE.png[]
+
+Apprentissage
+~~~~~~~~~~~~~
+
+* Descente de gradient
 
 Conclusion
 ----------
 
+* Un neurone ne fait pas un cerveau
+ 
+ mais
 
-
+* On a besoin d'un cerveau pour comprendre le neurone
 
 
 
