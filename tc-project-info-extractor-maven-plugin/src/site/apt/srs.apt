@@ -1,0 +1,17 @@
+Project info extracttor maven plugin Software Requirements Specification
+
+* Liste des focntionnalités principales
+
+** @req SRS_DATA_EXTRACTOR_PLUGIN_010
+
+  Le composant permet l'extraction des informations suivantes: GroupId;ArtifactId;Version;Packaging;Name;Description
+  
+        * @version 0.1.0
+        
+        * @derive SRS_TC_PARENT_FUNC_010
+
+        * @specify SDD_TC_PARENT_FUNC_010      
+
+        * @T  
+
+

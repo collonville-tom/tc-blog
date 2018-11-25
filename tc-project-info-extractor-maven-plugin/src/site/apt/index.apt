@@ -1,0 +1,3 @@
+Introduction
+
+   Composant maven pour extraire des informations dans les differents projets sous la forme d'une matrice de données. Les informations sont orienté sur les données contenu dans le pom mais peuvent contenir eventuellement des informations issues des classes, des docs ou des dependances

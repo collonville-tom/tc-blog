@@ -9,3 +9,5 @@ Les presentations:
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/asciidoc-article/ascii-article.html
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/tc-asciidoctor-article/ascii-article.html
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/tc-que-faire-avec-un-neurone/quefaireavecunneurone.html
+
+Concerne aussi des developpements standard (Java, Liquibase, SGBD, etc...)

@@ -1,0 +1,24 @@
+Project info extracttor maven plugin Software Design Description
+
+* Liste des focntionnalités principales
+
+** @req SDD_DATA_EXTRACTOR_PLUGIN_010
+
+  Le composant est un plug in maven heritant du pom tc-maven-plugin-parent a l'aide de la commande "mvn maven.plugin:project-info-extractor-maven-plugin:extract"
+  
+        * @version 0.1.0
+        
+        * @refine SDD_TC_MAVEN_PLUGIN_USE_010
+
+        * @satisfy SRS_DATA_EXTRACTOR_PLUGIN_010
+
+** @req SDD_DATA_EXTRACTOR_PLUGIN_010
+
+  Le composant genere un fichier a la racine du disque appele resultFile sous format csv
+  
+        * @version 0.1.0
+        
+        * @depend SDD_DATA_EXTRACTOR_PLUGIN_010
+
+        * @satisfy SRS_DATA_EXTRACTOR_PLUGIN_010
+        
