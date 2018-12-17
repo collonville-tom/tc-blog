@@ -14,8 +14,6 @@ Version 0.1.0-SNAPSHOT, 20/11/2018
 [quote, Robert Heinlein]
 When one teach, two learn
 
-[TIP]
-Ou un peu d'espoir pour certains d'entre nous...
 
 Sommaire
 --------
@@ -23,7 +21,7 @@ Sommaire
 * Historique
 * Le neurone 
 * Processus de traitement
-* Exemple 
+* Exemples 
 
 
 Qu'est ce que l'IA
@@ -43,7 +41,7 @@ Historique
 Historique
 ~~~~~~~~~~
 * 1986 : Paul Smolenski : Machine de BOLTZMANN 
-* 1997: Deep Blue
+* 1997 : Deep Blue
 * 2011 : Watson
 * 2014 : LeCun Deep Learning 
 * 2015 : Alpha Go
@@ -57,7 +55,7 @@ Non-supervisé
 
 * Foret aléatoire 
 * Clustering et réduction de dimension 
-* SVD 
+* Decomposition Valeurs Singulieres
 * Analyse par composante principale
 * Règles
 
@@ -151,17 +149,17 @@ Processus
 ** Jeux d'entrainement
 * Definition d'un modele
 * Apprentissage
-* Mesure d'efficacité 
+* Mesure de l'efficacité 
 * Mise en exploitation
 
 Exemples
 --------
 
 * Problemes de classification
-* Approche Linéaire
-* Approche Sigmoide
+** Approche Linéaire
+** Approche Sigmoide
 * Probleme de regression
-* Approche Linéaire
+** Approche Linéaire
 
 
 Probleme de tri
@@ -190,6 +188,11 @@ def generateSet(prototype,nbrEchantillon,coef):
 
 Les données
 ~~~~~~~~~~~
+
+* Profil moyen
+** pastèque [0.2, 0.3, 0.2, 0.95] 
+** anana [0.8, 0.65, 0.6, 0.8] 
+
 [source,python]
 ---------------
 pasteque=np.array([[0.2, 0.3, 0.2, 0.95]])
@@ -205,12 +208,6 @@ Les données
 
 image::donnePastequeAnana.png[800,600]
 
-Profil moyen
-~~~~~~~~~~~~
-
- pastèque [0.2, 0.3, 0.2, 0.95] 
- anana [0.8, 0.65, 0.6, 0.8] 
-
 La classification lineaire
 --------------------------
 
@@ -218,11 +215,11 @@ Solution adhoc
 ~~~~~~~~~~~~~~
 
 * W=[1;1;1;0]
-* biais 1,5
+* biais=1,5
 
 * Verification analytique
-** limiteur((Wt.pasteque)-biais)= limiteur( 0.4- 1.5)= limiteur(-1.1 )= 0
-** limiteur((Wt.anana)-biais)= limiteur( 2.35- 1.5)= limiteur(0.85 )= 1
+** limiteur((Wt.pasteque)-biais)= limiteur(0.4-1.5)= limiteur(-1.1)= 0
+** limiteur((Wt.anana)-biais)= limiteur(2.35-1.5)= limiteur(0.85)= 1
 
 Pourquoi ca marche
 ~~~~~~~~~~~~~~~~~~
@@ -246,7 +243,7 @@ Mesure de la performance
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Calcul du cout
-** Ratio des bonnes reponses par rapport au mauvaise
+** Ratio des bonnes reponses par rapport aux mauvaises
 
 * (2 echantillons de 2000 ananas et 2000 pasteques)
 * ne sont pas des pasteques: 71  
@@ -286,12 +283,12 @@ Precision et rappel
 ** capacité à détecter des pastèques en présence d’ananas 
 ** 0.90 de chance que le modèle réponde que le fruit est un ananas
 * Rappel ou sensibilité : VP/(VP+FN)= 1938/(1938+62) =0.97 
-** capacité à réellement détecter une pastèque dans un ensemble ne contenant que de pastèques
+** capacité à détecter une pastèque dans un ensemble ne contenant que de pastèques
 
 Apprentissage
 ~~~~~~~~~~~~~
 
-* supervisés -> on indique la bonne reponse
+* supervisé -> on indique la bonne reponse
 * non supervisé -> le modele interprete la reponse (approche par clustering)
 * semi-supervisé
 
@@ -350,8 +347,13 @@ def neuroneSig(entre,W,biais):
     return sigmoid(a)
 ---------------
 
-Resultat
-~~~~~~~~
+Sigmoide rappel
+~~~~~~~~~~~~~~~
+
+image::limiteur.png[800,600]
+
+Resultats
+~~~~~~~~~
 
 * (jeux de données de 1000 elements)
 * 15 données indécidables
@@ -557,10 +559,3 @@ Conclusion
 * Un neurone ne fait pas un cerveau
  
 * On a besoin d'un cerveau pour comprendre le neurone
-
-
-
-
-
-
-
