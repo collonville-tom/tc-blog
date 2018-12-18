@@ -1,0 +1,561 @@
+Que faire avec un neurone ?
+===========================
+Collonville Thomas                                     
+Version 0.1.0-SNAPSHOT, 18/12/2018                                             
+
+:sectnums:                                                          
+:toc:                                                               
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation du neurone                              
+:keywords: Neurone IA Machine learning python                                                 
+:imagesdir: ./img                                                   
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+
+Sommaire
+--------
+* Qu'est ce que l'IA
+* Historique
+* Le neurone 
+* Processus de traitement
+* Exemples 
+
+
+Qu'est ce que l'IA
+------------------
+
+image::IAdecoupe.png[800,600]
+
+Historique
+----------
+
+* 1940 : Alan TURING : Machine de Turing
+* 1943 : Warren McCULLOCH & Walter PITTS Modèle formel de neurone.
+* 1949 : Donald HEBB : Mémoire associative, premières règles d'apprentissage.
+* 1960 : Franck ROSENBLATT et Bernard WIDROW, Perceptron et Adaline.
+* 1980 : Stephen GROSSBERG et Teuvo KOHONEN Auto-organisation des réseaux et adaptation
+
+Historique
+~~~~~~~~~~
+* 1986 : Paul Smolenski : Machine de BOLTZMANN 
+* 1997 : Deep Blue
+* 2011 : Watson
+* 2014 : LeCun Deep Learning 
+* 2015 : Alpha Go
+* 2018 : Alexa
+
+Les modeles
+-----------
+
+Non-supervisé
+~~~~~~~~~~~~~
+
+* Foret aléatoire 
+* Clustering et réduction de dimension 
+* Decomposition Valeurs Singulieres
+* Analyse par composante principale
+* Règles
+
+Supervisé
+~~~~~~~~~
+
+* Régression linéaire ou logistique 
+* Descente de gradient  
+* Régression polynomiale 
+* Séparation a vaste marge (SVM) 
+* Arbre de descision 
+* Classification linéaire ou non linéaire 
+* Réseau de neurone 
+* Naïve bayes
+
+Le neurone 
+----------
+
+* Outil mathématique 
+* Formalisé par McCULLOCH et PITTS
+
+Le neurone biologique
+~~~~~~~~~~~~~~~~~~~~~
+
+image::Neurone.png[800,600]
+
+Constitution
+~~~~~~~~~~~~
+
+* d'un noyau : le cœur de la cellule neuronale
+* de dendrites permettant d’agréger les informations entrantes venant des synapses
+* d'axones fournissant la réponse neuronale
+* de synapses : interconnexion entre les axones et les dendrites permettant le transfert de l’influx nerveux 
+
+Quelques nombres
+~~~~~~~~~~~~~~~~
+
+* 100 Milliards de neurones
+* 10000 Synapses par neurone 
+* 10^15 Synapses dans le cerveau humain
+
+Utilité
+~~~~~~~
+
+* Mémoire et persistance des données dans le temps
+* Réflexion, élaboration des idées, associer des concepts et des stratégies 
+* Sens, Analyse des données, traitements des sons, des images, du touché
+* Construction d'une réponse moteur, l’équilibre, l'orientation, la marche, dextérité
+
+Le neurone formel
+~~~~~~~~~~~~~~~~~
+image::modeleMathNeurone.png[]
+image::modeleMatriciel.png[]
+
+* a la sortie du neurone
+* xi, le signal d'entré 
+* wi, le poid de ponderation 
+* biais, une constante de pondération 
+* f, la fonction d’activation 
+
+Le neurone formel
+~~~~~~~~~~~~~~~~~
+
+image::ModeleNeurone.png[800,600]
+
+La fonction d'activation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Lineaire
+~~~~~~~~
+
+image::lineaire.png[800,600]
+
+Sigmoire
+~~~~~~~~
+
+image::sigmoide.png[800,600]
+
+Limiteur
+~~~~~~~~
+
+image::limiteur.png[800,600]
+
+Processus
+---------
+
+* Analyse du probleme
+** Nettoyage des données
+** Visualisation des données
+** Jeux de test
+** Jeux d'entrainement
+* Definition d'un modele
+* Apprentissage
+* Mesure de l'efficacité 
+* Mise en exploitation
+
+Exemples
+--------
+
+* Problemes de classification
+** Approche Linéaire
+** Approche Sigmoide
+* Probleme de regression
+** Approche Linéaire
+
+
+Probleme de tri
+---------------
+
+image::ProblemeClassification.png[]
+* a rugosité -> 0 lisse a 1 rugeux
+* la couleur -> 0 bleu a 1 rouge
+* la forme -> 0 rond a 1 alongé
+* le poid -> 0 (20gr) à 1 (2000gr)
+
+Les données
+~~~~~~~~~~~
+
+[source,python]
+---------------
+def generateSet(prototype,nbrEchantillon,coef):
+    rand_value=np.random.randn(len(prototype),len(prototype[0]))/coef
+    #print(rand_value)
+    rand_set=prototype+rand_value
+    if nbrEchantillon == 0 :
+        return prototype
+    else:
+        return np.concatenate((rand_set,generateSet(prototype,nbrEchantillon-1,coef)))
+---------------
+
+Les données
+~~~~~~~~~~~
+
+* Profil moyen
+** pastèque [0.2, 0.3, 0.2, 0.95] 
+** anana [0.8, 0.65, 0.6, 0.8] 
+
+[source,python]
+---------------
+pasteque=np.array([[0.2, 0.3, 0.2, 0.95]])
+anana=np.array([[0.8, 0.65, 0.6, 0.8]])
+
+pasteques=generateSet(pasteque,1999,10)
+ananas=generateSet(anana,1999,10)
+# 10 -> pour separer les ensembles
+---------------
+
+Les données
+~~~~~~~~~~~
+
+image::donnePastequeAnana.png[800,600]
+
+La classification lineaire
+--------------------------
+
+Solution adhoc
+~~~~~~~~~~~~~~
+
+* W=[1;1;1;0]
+* biais=1,5
+
+* Verification analytique
+** limiteur((Wt.pasteque)-biais)= limiteur(0.4-1.5)= limiteur(-1.1)= 0
+** limiteur((Wt.anana)-biais)= limiteur(2.35-1.5)= limiteur(0.85)= 1
+
+Pourquoi ca marche
+~~~~~~~~~~~~~~~~~~
+
+image::setWithVect.png[800,600]
+
+Solution logicielle
+~~~~~~~~~~~~~~~~~~~
+
+[source,python]
+---------------
+def neuroneLim(entre,W,biais):
+    a=np.dot(entre,W.T)-biais
+    #print("a neurone:",a)
+    if a > 0:
+        return 1
+    return 0
+---------------
+
+Mesure de la performance
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Calcul du cout
+** Ratio des bonnes reponses par rapport aux mauvaises
+
+* (2 echantillons de 2000 ananas et 2000 pasteques)
+* ne sont pas des pasteques: 71  
+** taux de reussite : 96.49824912456228
+* sont des ananas: 1815 
+** taux de reussite : 90.79539769884943
+
+
+Superposition
+~~~~~~~~~~~~~
+
+image::donnePastequeAnanaNonSepare.png[800,600]
+
+Outil plus precis?
+
+Matrice de confusion
+~~~~~~~~~~~~~~~~~~~~
+
+image::matConf.png[]
+
+Interpretation
+~~~~~~~~~~~~~~
+
+* (jeux de données de 4000 elements)
+* 1938 Vrai Positif 
+* 1798 Vrai Négatif 
+* risque alpha ou erreur de premiere espece
+** 202 Faux Positif 
+* risque beta ou erreur de seconde espece
+** 62 Faux Négatif 
+
+
+Precision et rappel
+~~~~~~~~~~~~~~~~~~~
+
+* Précision : VP/(VP+FP)= 1938/(1938+202) = 0.90 
+** capacité à détecter des pastèques en présence d’ananas 
+** 0.90 de chance que le modèle réponde que le fruit est un ananas
+* Rappel ou sensibilité : VP/(VP+FN)= 1938/(1938+62) =0.97 
+** capacité à détecter une pastèque dans un ensemble ne contenant que de pastèques
+
+Apprentissage
+~~~~~~~~~~~~~
+
+* supervisé -> on indique la bonne reponse
+* non supervisé -> le modele interprete la reponse (approche par clustering)
+* semi-supervisé
+
+* si etiquete - sortie > 0 alors W=W+data 
+* si etiquete - sortie < 0 alors W=W-data
+* si etiquete - sortie = 0 alors W
+
+Apprentissage
+~~~~~~~~~~~~~
+
+[source,python]
+---------------
+def majW(W, sortie, etiquette,entree):
+    return W+(etiquette-sortie)*entree
+
+for (val,etiquete) in datasApprentissage:
+    sortie=neuroneLim(val,W,biais)
+    W=majW(W, sortie, etiquete,val)
+---------------
+
+Test de l'apprentissage
+~~~~~~~~~~~~~~~~~~~~~~~
+
+[source,python]
+---------------
+for (val,etiquete) in datasTest:
+    sortie=neuroneLim(val,W,biais)
+    #print(sortie,etiquete)
+    if sortie != etiquete:
+        erreur.append(erreur[len(erreur)-1]+1)
+    else:
+        erreur.append(erreur[len(erreur)-1])
+---------------
+
+Test de l'apprentissage
+~~~~~~~~~~~~~~~~~~~~~~~
+
+image::tauxerreru.png[800,600]
+
+La classification sigmoide
+--------------------------
+
+Modele Sigmoide
+~~~~~~~~~~~~~~~
+
+[source,python]
+---------------
+def neuroneCore(entre,W,biais):
+    return np.dot(entre,W.T)-biais
+
+def sigmoid(a):
+    return 1 / (1 + math.exp(-a))
+    
+def neuroneSig(entre,W,biais):
+    a=neuroneCore(entre,W,biais)
+    return sigmoid(a)
+---------------
+
+Sigmoide rappel
+~~~~~~~~~~~~~~~
+
+image::limiteur.png[800,600]
+
+Resultats
+~~~~~~~~~
+
+* (jeux de données de 1000 elements)
+* 15 données indécidables
+* 471 pasteques qui sont bien des pasquetes!
+* 452 ananas qui sont bien des ananas!
+
+* risque alpha ou erreur de premiere espece
+** 22 ananas qui se prennent pour des pastèques 
+
+* risque beta ou erreur de seconde espece
+** 40 pasteques qui se prennent pour des ananas
+
+
+Interpretation
+~~~~~~~~~~~~~~
+
+image::datasSig.png[800,600]
+
+La regression lineaire
+----------------------
+
+Problematique
+~~~~~~~~~~~~~
+
+image::donneesBruite.png[800,600]
+
+Estimateur
+~~~~~~~~~~
+
+image::estimateurLineaire.png[]
+
+ Equation Normale
+
+image::equationNormale.png[]
+
+Inference
+~~~~~~~~~
+
+[source,java]
+---------------
+public Double linearInfer(Double[] stepInputs)
+{
+    Stream.Builder<Double> sum=Stream.<Double>builder();
+    for(int i=0;i<dendrites.length;i++)
+    {
+        if(i<stepInputs.length)
+            sum.add(dendrites[i]*stepInputs[i]);
+        else
+            sum.add(dendrites[i]);
+    }
+    return sum.build().reduce((x,y)-> x+y).get();;
+}
+---------------
+
+Performance
+~~~~~~~~~~~
+
+* MSE : Mean Square Error
+* RMSE: Root Mean Square Error
+
+image::MSE.png[]
+
+* MAE : Mean Absolute Error
+
+image::MAE.png[]
+
+Apprentissage
+~~~~~~~~~~~~~
+
+image::correctionPoids.png[]
+
+* Descente de gradient
+
+image::deriveMAE.png[]
+
+MAE implantation
+~~~~~~~~~~~~~~~~
+
+[source,java]
+---------------
+public Double MAE(Set<Data> datasSet)
+{
+    Double eccartAbsolue=datasSet.stream()
+            .map(x ->x.input[0]*Math.abs( this.linearInfer(x.input)-(x.output)))
+            .reduce((x,y) -> x+y).get();
+    System.out.println("Calcul MAE : "+eccartAbsolue/datasSet.size());
+    return eccartAbsolue/datasSet.size();
+}
+---------------
+
+MAE derivée partielle
+~~~~~~~~~~~~~~~~~~~~~
+
+[source,java]
+---------------
+public Double MAEpente(Set<Data> datasSet)
+{
+    Double eccartAbsolue=datasSet.stream()
+            .map(x ->x.input[0]*( this.linearInfer(x.input)-(x.output)))
+            .reduce((x,y) -> x+y).get();
+    System.out.println("Calcul MAEpentre : "+eccartAbsolue/datasSet.size());
+    return eccartAbsolue/datasSet.size();
+}
+
+public Double MAEbiais(Set<Data> datasSet)
+{
+    Double eccartAbsolue=datasSet.stream()
+            .map(x ->(  this.linearInfer(x.input)-(x.output)))
+            .reduce((x,y) -> x+y).get();
+    System.out.println("Calcul MAEbiais : "+eccartAbsolue/datasSet.size());
+    return eccartAbsolue/datasSet.size();
+}
+---------------
+
+Apprentissage
+~~~~~~~~~~~~~
+
+[source,java]
+---------------
+public void learnStep(Set<Data> datasSet)
+{
+    Double MAEpente=this.MAEpente(datasSet);
+    Double MAEbiais=this.MAEbiais(datasSet);
+    maeDescent.append(dendrites[0]).append("\t")
+            .append(dendrites[1]).append("\t").append(MAEpente).append("\t").append(MAEbiais).append("\n");
+    dendrites[0] = dendrites[0] - ammortissement*MAEpente;
+    dendrites[1] = dendrites[1] - 1000*ammortissement*MAEbiais;
+    ammortissement=ammortissement/1.01;
+}
+---------------
+
+Carte de performance
+~~~~~~~~~~~~~~~~~~~~
+
+* etape de visualisation
+* exploration de l'espace des parametres
+* evaluation du cout (MAE)
+
+Exemples de regression 
+----------------------
+
+* Cas de l'identification de parametres
+* Cas de regression
+
+Identification
+~~~~~~~~~~~~~~
+
+image::droite.png[800,600]
+
+Identification : resultat
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::evolSimple.png[800,600]
+
+Identification : perf
+~~~~~~~~~~~~~~~~~~~~~
+
+image::maeAngle.png[800,600]
+
+Identification (gradient)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::plansup.png[800,600]
+
+Regression (cas 1)
+~~~~~~~~~~~~~~~~~~
+
+image::droiteBruite.png[800,600]
+
+Regression (resultat)
+~~~~~~~~~~~~~~~~~~~~~
+
+image::evolSimple2.png[800,600]
+
+Regression (cas 2)
+~~~~~~~~~~~~~~~~~~
+
+image::donneeDispersee.png[800,600]
+
+Regression (resultat)
+~~~~~~~~~~~~~~~~~~~~~
+
+image::poorDataEvol.png[800,600]
+
+Regression (perf????)
+~~~~~~~~~~~~~~~~~~~~~
+
+image::vallee.png[800,600]
+
+Regression (Bonus Stage)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::carteOscillation.png[800,600]
+
+Regression (Bonus Stage)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+image::oscillation.png[800,600]
+
+Conclusion
+----------
+
+* Un neurone ne fait pas un cerveau
+ 
+* On a besoin d'un cerveau pour comprendre le neurone
