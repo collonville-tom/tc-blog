@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tc.asciidoctor</groupId>
 	<artifactId>tc-que-faire-avec-un-neurone</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<name>${project.artifactId}-${project.version}</name>
 	<description>Article pour la presentation sur le neurone</description>
 
