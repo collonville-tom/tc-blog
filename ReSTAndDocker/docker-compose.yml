@@ -1,0 +1,13 @@
+version: '3'
+services:
+  rest-people:
+    image: rest-people
+    ports:
+      - "5001:5001"
+    expose:
+      - "5001"
+
+  rest-people-stat:
+    image: rest-people-stat
+    ports:
+      - "5002:5002"
