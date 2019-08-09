@@ -2,6 +2,11 @@ version: '3'
 services:
   rest-people:
     image: rest-people
+    build:
+      context: .
+      dockerfile: Dockerfile_people
+      args:
+        - gitcommithash=${gitHash}
     ports:
       - "5001:5001"
     expose:
@@ -9,5 +14,10 @@ services:
 
   rest-people-stat:
     image: rest-people-stat
+    build: 
+      context: .
+      dockerfile: Dockerfile_stat
     ports:
       - "5002:5002"
+    depends_on:
+      - rest-people
