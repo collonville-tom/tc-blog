@@ -8,3 +8,4 @@ RUN pip3 install setuptools Wheel
 RUN pip3 install flask
 COPY . /opt/
 CMD cd /opt;python3 -m people
+EXPOSE 5001

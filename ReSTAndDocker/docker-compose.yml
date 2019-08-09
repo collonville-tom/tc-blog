@@ -11,6 +11,7 @@ services:
       - "5001:5001"
     expose:
       - "5001"
+    restart: always
 
   rest-people-stat:
     image: rest-people-stat
@@ -19,5 +20,8 @@ services:
       dockerfile: Dockerfile_stat
     ports:
       - "5002:5002"
+    restart: always
     depends_on:
       - rest-people
+    environment:
+      - APP_VARIABLE=${APP_VARIABLE}
