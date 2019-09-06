@@ -1,0 +1,34 @@
+version: '3'
+services:
+  iptables-test-front:
+    image: iptables-test-front
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    network_mode: "host"
+    restart: always
+    cap_add:
+      - NET_ADMIN
+
+  iptables-test-accept:
+    image: iptables-test-accept
+    build:
+      context: .
+      dockerfile: test/Dockerfile
+    ports:
+      - "9999:9999"
+    cap_add:
+      - NET_ADMIN
+
+  iptables-test-reject:
+    image: iptables-test-reject
+    build:
+      context: .
+      dockerfile: test/Dockerfile
+    ports:
+      - "6666:6666"
+    cap_add:
+      - NET_ADMIN
+
+
+    
