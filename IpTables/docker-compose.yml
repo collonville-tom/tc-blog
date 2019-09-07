@@ -15,6 +15,8 @@ services:
     build:
       context: .
       dockerfile: test/Dockerfile
+    environment:
+      listenport: 9999
     ports:
       - "9999:9999"
     cap_add:
@@ -25,6 +27,8 @@ services:
     build:
       context: .
       dockerfile: test/Dockerfile
+    environment: 
+      listenport: 6666      
     ports:
       - "6666:6666"
     cap_add:
