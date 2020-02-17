@@ -21,6 +21,7 @@ services:
       - "9999:9999"
     cap_add:
       - NET_ADMIN
+    restart: always
 
   iptables-test-reject:
     image: iptables-test-reject
@@ -33,6 +34,7 @@ services:
       - "6666:6666"
     cap_add:
       - NET_ADMIN
+    restart: always
 
 
     
