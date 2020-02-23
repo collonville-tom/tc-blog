@@ -1,0 +1,39 @@
+server:
+  port: 8081
+
+notification:
+  exchange:
+    myExchangeA:
+      name: myExchangeA
+      message:
+        flux1: flux1
+        flux2: flux2
+    myExchangeB:
+      name: myExchangeB
+      message:
+        flux1: "flux1.toto"
+        flux2: "tata.flux2"
+
+
+spring:
+  application:
+    name: client
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: user
+    password: password
+ 
+endpoints:
+  enabled: true
+  health:
+    enabled: true
+  consul:
+    enabled: true
+
+logging:
+  level:
+    root: info
+    org:
+      tc: debug
+  

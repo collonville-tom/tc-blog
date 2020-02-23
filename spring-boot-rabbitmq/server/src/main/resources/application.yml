@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+notification:
+  queue:
+    myQueueA: myQueueA
+    myQueueB: myQueueB
+
+
+
+spring:
+  application:
+    name: server
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: user
+    password: password
+
+endpoints:
+  enabled: true
+  health:
+    enabled: true
+  consul:
+    enabled: true
+
+logging:
+  level:
+    root: info
+    org:
+      tc: debug
+  
