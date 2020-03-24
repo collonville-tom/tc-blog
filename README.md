@@ -6,8 +6,12 @@ Dans les articles disponibles dans l'onglet IA:
 
 Les presentations:
 
-* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/asciidoc-article/ascii-article.html
-* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/tc-asciidoctor-article/ascii-article.html
-* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/tc-que-faire-avec-un-neurone/quefaireavecunneurone.html
+* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/slides/tc-asciidoctor-article-0.2.0/ascii-article.html
+* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/slides/tc-que-faire-avec-un-neurone-0.2.0/tc-que-faire-avec-un-neurone.html
+
+Versions articles:
+
+* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-asciidoctor-article-0.2.0/ascii-article.html
+* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-que-faire-avec-un-neurone-0.2.0/tc-que-faire-avec-un-neurone.html
 
 Concerne aussi des developpements standard (Java, Liquibase, SGBD, etc...)
