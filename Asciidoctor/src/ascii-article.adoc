@@ -1,7 +1,7 @@
 Asciidoc(tor)                              
 =============
 Collonville Thomas                                     
-Version 0.1.0-SNAPSHOT, 13/11/2018                                             
+Version 0.2.0, 24/03/2020                                             
 
 :sectnums:                                                          
 :toc:                                                               

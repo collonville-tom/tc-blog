@@ -1,7 +1,7 @@
 Que faire avec un neurone ?
 ===========================
 Collonville Thomas                                     
-Version 0.1.1, 18/12/2018                                             
+Version 0.2.0, 24/03/2020                                        
 
 :sectnums:                                                          
 :toc:                                                               
