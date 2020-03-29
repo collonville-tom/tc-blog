@@ -1,0 +1,106 @@
+= Raid                              
+Collonville Thomas                                     
+Version 0.1.0, 27/03/2020                                             
+
+:sectnums:                                                          
+:toc:                                                           
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation de Raid                              
+:keywords: Raid                                                 
+:imagesdir: ./img                                                   
+
+ifeval::["{backend}"=="html5"]
+:article:
+endif::[]
+ifeval::["{backend}"=="pdf"]
+:article:
+endif::[]
+ifeval::["{backend}"=="revealjs"]
+:presentation:
+endif::[]
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+== Introduction
+
+ifdef::article[]
+
+Aujourd'hui un article court! et qui va aussi me servir d'aide memoire: RAID!
+
+=== Besoin 
+
+RAID? Oui Raid, pas le produit anti mouche, mais la solution de resilience du stockage! Attention, ici on ne parle pas de base de données mais d'une solution permettant de gerer la sauvegarde de données en terme de disponibilité et d'integrité en cas de panne! Il s'agit en fait d'une technique de gestion des données au niveau le plus bas possible, entre autre, au niveau des disques!
+
+=== Solutions
+
+Ainsi Il va exister differents niveaux RAID, assurant differents types de gestions des disques, allant de RAID 0 a RAID 10:
+
+* RAID 0: il ne s'agit pas d'une configuration permettant d'assurer de la sauvegarde mais de pouvoir tirer le maximum des performances des disques (en distribuant les données). Cette config necessite au moins 2 disques.
+* RAID 1: avec deux disques au moins, cette configuration permet de dupliquer a l'identique les informations sur les disques comme s'il n'y en avait qu'un. Aisni en cas de panne, la redondance permet de garantir les données. Coté performance, vous permettrez d'ameliorer le nombre d'acces disque parrallele au meilleur taux de transfert (limité a la vitesse d'acces disque classique)
+* RAID 5: le RAID 5 est une combinaison du RAID 0 et du RAID 1 et necessite 3 disques au minimum permettant d'ameliorer les perf et de se garantir de la perte d'un disque. au dela les données seront perdu.
+* RAID 6: le RAID 6, c'est du RAID 5 mais avec une gestion permettant la perte acceptable de deux disques avant la perte irremediable de données. Cela necessite donc 4 disques...
+* RAID 10: Avec 4 disques, ce mode est une combinaison matricielle du RAID 1 sur n disque et du RAID 0 sur m cluster des disques RAID 1. Le RAID 1 a pour but de garantir l'integrité des données alors que le RAID 0 se veut optimiser les performances.
+
+image::RAID10.png[RAID 10]
+
+endif::[]
+
+ifdef::presentation[]
+
+=== Besoin 
+
+* solution de resilience du stockage
+* disponibilité 
+* integrité 
+
+* Niveau 0 a 10
+
+=== RAID BASE
+
+* RAID 0: 2 disques, performance
+* RAID 1: 2 disques, integrité
+* RAID 5: 3 disque combinaison RAID 0 et du RAID 1 
+** perte acceptable: 1 disque
+* RAID 6: RAID 5 ++
+** perte acceptable: 2 disque
+
+=== RAID 10
+
+* RAID 10: 4 disques performance et integrité, 
+** combinaison matricielle du RAID 1 sur n disque et du RAID 0 sur m cluster des disques RAID 1
+
+image::RAID10.png[RAID 10]
+
+endif::[]
+
+== Exemple
+
+Le cas du RAID 1
+
+=== Identification des disques
+
+  fdisk -l
+
+=== Creation du RAID 1
+
+  mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1
+
+=== Formatage du disque
+
+  mkfs.ext4 /dev/md0
+ 
+=== Montage du disque
+
+Ajouter au fichier /etc/fstab la ligne suivante
+
+  /dev/md0 /mnt/raid ext4 defaults 0 1
+
+Pour ensuite monter le disque
+
+  mount -a
+
+== References
+
+* [ubuntu-raid] https://doc.ubuntu-fr.org/raid_logiciel
