@@ -1,0 +1,201 @@
+= samhain                              
+Collonville Thomas                                     
+Version 0.1.0, 27/03/2020                                             
+
+:sectnums:                                                          
+:toc:                                                           
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation de samhain                              
+:keywords: samhain                                                 
+:imagesdir: ./img                                                   
+
+ifeval::["{backend}"=="html5"]
+:article:
+endif::[]
+ifeval::["{backend}"=="pdf"]
+:article:
+endif::[]
+ifeval::["{backend}"=="revealjs"]
+:presentation:
+endif::[]
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+== Introduction
+
+ifdef::article[]
+
+Samhain [samhain] est un outil de control d’intégrité pour les OS ou il importe de vérifier qu'une configuration n'est pas altérée dans le temps et qu'aucune intrusion n'a été réalisée.
+
+Pour ce faire l'outil va procéder au stockage de l'ensemble des empreintes des fichiers du système pour lesquels vous souhaitez assurer des garanties.
+
+Pour cela il faudra configurer le fichier */etc/samhain/samhainrc* avec l'ensemble des fichiers et répertoire sur lesquels opérer la surveillance.
+
+Par défaut, cette configuration est largement déjà pertinente: surveillance des répertoires /etc, /var etc...
+
+endif::[]
+
+ifdef::presentation[]
+=== Objet
+* Intégrité 
+** control configuration 
+** intrusion 
+
+=== Approche
+
+* Stockage des empreintes
+* Configuration unique */etc/samhain/samhainrc* 
+* Config par defaut pertinente
+
+endif::[]
+
+== En pratique
+
+
+=== Installation
+
+ifdef::article[]
+
+Dans la pratique, Samhain est plutôt simple à utiliser:
+
+D'abord l'installer depuis le dépôt:
+
+  $sudo apt-get install samhain
+
+Ou depuis le targz sur le site officiel ce qui permet d avoir la derniere version:
+
+  $wget https://la-samhna.de/samhain/samhain-current.tar.gz
+
+on depackage:
+
+  $gunzip /tmp/samhain-current.tar.gz
+  $tar -xf /tmp/samhain-current.tar
+  $gunzip samhain-4.4.1.tar.gz
+  $tar -xf samhain-4.4.1.tar
+
+Et on build:
+
+  $cd /tmp/samhain-4.4.1
+  $sudo ./configure
+  $sudo make
+  $sudo make install
+
+Et si vous souhaitez qu'un check soit fait lors des reboot:
+
+  $sudo make install-boot
+
+endif::[]
+
+ifdef::presentation[]
+
+En standard
+
+* sudo apt-get install samhain
+
+En manuel:
+
+* wget https://la-samhna.de/samhain/samhain-current.tar.gz
+* and make...
+
+endif::[]
+
+=== Initialisation
+
+ifdef::article[]
+
+Enfin suite à l'installation, il faut initialiser la base de données (a faire qu'une seule fois):
+
+endif::[]
+
+  $sudo samhain -t init
+
+=== Utilisation
+
+ifdef::article[]
+
+Ensuite dans son utilisation on procede a des checks reguliers:
+
+endif::[]
+
+  $sudo samhain -t check
+
+ifdef::article[]
+
+Et si il est necessaire de mettre à jour la base des empreintes (suite a l'installation d'une nouvelle application), on appelle la commande update
+
+endif::[]
+
+  $sudo samhain -t update
+
+=== Configuration
+
+ifdef::article[]
+
+Comme precisé dans l'introduction, la configuration (chapitre 5, [samhain]), de samhain se réalise dans le fichier */etc/samhainrc*
+
+Cette configuration se realise par l'application de regles sur des repertoires ou des fichiers (attention qui peuvent etre des repertoires sous unix tout est fichier)
+
+Les relgles s'appliquent par des instructions precisées entre *[]*. Ces instructions peuvent etre soit definies par l'utilisateur (ce que nous ne verons pas ici) soit utilisées via un pool d'instructions et regles pre-existantes.
+
+endif::[]
+
+ifdef::presentation[]
+
+=== Regles
+
+Configuration:
+
+* */etc/samhainrc*
+* Definition de regles de securités
+* Pattern: *[]*
+* *ReadOnly, LogFiles, GrowingLogFiles, Attributes, IgnoreAll, IgnoreNone*
+
+endif::[]
+
+Par exemple:
+
+  [ReadOnly]
+  dir = /some/directory
+
+ifdef::article[]
+
+La liste des instructions regles pre-existante *ReadOnly, LogFiles, GrowingLogFiles, Attributes, IgnoreAll, IgnoreNone*, etc... reponds deja globalement a l'ensemble des besoins pouvant etre exprimés en terme de verification d'integrité.
+
+=== Notification
+
+Dernier point important, lors d'un check, même si celui ci est réalisé manuellement, il est important d'informer des anomalies éventuelles détectées mais aussi de les remonter auprès des systèmes d'informations en charge du monitoring.
+
+D'une part en tant que producteur de log et l'alerte, la configuration des niveau de criticité des messages se gère dans la section *[EventSeverity]* du même fichier de configuration.
+
+De même, le type de flux d'alerte peut être configurer dans ce même fichier auprès de la même section permettant de produire ces alertes sous la forme de mail (chapitre 4.4), de flux syslog (chapitre 4.11) ou de messages (chapitre 7) a destination d'un serveur distant Samhain nommé Yule.
+
+Le propos n'est pas de rentrer dans le détails ici de cette configuration mais syslog étant un type support standard pour la gestion de messages au travers d'un SI, il n'est déconnant de se tourner vers lui pour gérer ensuite agrégation du suivi et des alertes.
+
+endif::[]
+
+ifdef::presentation[]
+
+=== Notification
+
+Configuration:
+
+* */etc/samhainrc*
+
+Type de flux:
+
+* mail (chapitre 4.4)
+* syslog (chapitre 4.11) 
+* messages (chapitre 7) a destination d'un server distant (Yule)
+
+endif::[]
+
+== References
+
+* [samhain] https://la-samhna.de/samhain/
+* [simple] http://www.lestutosdenico.com/outils/samhain-multi-systeme-exploitation
+* [more-difficult] https://www.howtoforge.com/host-based-intrusion-detection-samhain
+
+
+
