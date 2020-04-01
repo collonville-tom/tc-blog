@@ -1,0 +1,232 @@
+= docker-swarm                              
+Collonville Thomas                                     
+Version 0.1.0, 04/04/2020                                              
+
+:sectnums:                                                          
+:toc:                                                           
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation de docker-swarm   
+:keywords: docker-swarm                                                 
+:imagesdir: ./img       
+:source-highlighter: pygments
+:pygments-style: emacs
+:icons: font
+:nofooter:
+
+ifeval::["{backend}"=="html5"]
+:article:
+endif::[]
+ifeval::["{backend}"=="pdf"]
+:article:
+endif::[]
+ifeval::["{backend}"=="revealjs"]
+:presentation:
+endif::[]
+
+
+== Introduction
+
+=== Problematique Microservices
+
+Dans le contexte des infrastructures microservices, docker [docker] est la reference! Jusqu'a maintenant nous avions surotut vu son utilisation dans le cadre du processus de developpement voir d'integration, mais nous ne sommes pas allé sur le terrain de la mise en production.
+
+Qu'est ce que je veux dire? Ce que je veux dire, c'est qu'une architecture microservice necessite forcement plusieurs micorservice et c'est pour cela d'ailleur que nous avons vite utilisé [docker-compose] afin de nous faciliter la vie en lancant l'ensemble de ces microservices ensemble, pour ainsi dire "orchestrer".
+
+Pourtant docker-compose n'est pas suffisant, en effet celui ci nous permet de mettre en place une deployement cible de nos microservices mais ces derniers n'evolent alors que dans la machine dans laquelle docker-compose a ete invoqué!
+
+Dans le cas ou nous souhaiterions deployer l'ensemble de nos microservice selon des regles specifique de deploiement, (par exemple les composants front ensemble, les back ensemble etc...) alors il nous faut d'une part etre capable de deploier dans un ensemble de machine de facon transparente mais en plus de pouvoir facilement administrer ce deploiement!
+
+La solution a cette problematique c'est le sujet de cet article, docker-swarm [docker-swarm]
+
+== Architecture
+
+Docker swarm [docker-swarm-concepts] est un outil d'orchestration inclu dans docker engine. Un Swarm est un ensemble machine contenant docker et fonctionnant en mode swarm Danse ce cluster, on trouvera alors un *manager* (ou n selon la redondance souhaité) et des *worker* (le manager pouvant aussi cumuler le role de worker).
+
+image::swarm-archi.png[]
+
+Comme dans docker-compose, on declare des services correspondant a un etat descriptif de la configuration souhaitée aupres du manager qui va produire des taches de deploiement dans les workers.
+
+
+== Fonctionnalités
+
+Docker Swarm permet:
+
+* De gerer un cluster de noeud definit dans un reseau de machine potentiellement distribué et heterogene.
+* de fournir une description du deploiement orienté service comme docker compose
+* de scaler les instances pour ajouter de la redondance logique
+* de faire du monitoring et de la reconciliation: en cas de crash, swarm sera capable de detecter les instances eventuellement manquante et se chargera de les redemarrer
+* de faire des mise a jour a chaud pour realiser des modifications sur la configuration de deploiement comme des mise a jour applicative et docker se chargera de reconcilier l'etat reel avec l'etat voulu.
+* de loadbalancer la charge des flux sur les n instances (les replicas que nous verons plus loin)
+
+== Creation du cluster swarm
+
+=== Architecture cible
+
+image::swarm-archi-cible.png[]
+
+Dans notre archi, on va jouer avec 1 manager principal redondé une fois et 5 workers (incluant les 2 managers).
+
+On va vouloir faire un server de fichier via http (avec [nginx]) dont les données de configuration sont partagées via un partage [nfs] global au cluster. Par contre dans notre exemple nous considererons que les données a exposer ne sont disponible que sur manager et node1.
+
+Nos instances nginx devront donc se trouver sur l'une ou ces deux workers.
+
+=== Process
+
+Pour creer le swarm, on va suivre la doc! [create-swarm]
+
+On va sur la machine qui sera le manager et on execute la commande:
+
+  docker swarm init --advertise-addr 192.168.0.60
+
+On obtient une reponse de la forme:
+
+  docker swarm join --token SWMTKN-1-<token-value> 192.168.0.60:2377
+
+Cette commande il faudra aller l'executer sur chaque machine ou est installé docker-engine
+
+Avec la commande suivante il est possible de verifier que les noeuds ont bien eté ajouté:
+
+.Script shell
+[source,shell,linenums]
+----
+$ docker info
+----
+
+.Resultat Yaml
+[source,yaml,linenums]
+----
+Client:
+Debug Mode: false
+Server:
+Containers: 5
+  Running: 0
+  Paused: 0
+  Stopped: 5
+Images: 21
+Server Version: 19.03.6
+[...]
+Swarm: active
+  NodeID: tntgi3hb72z9ly8rgir8p1j9p
+  Is Manager: true
+  ClusterID: wr0n081vcbdyxaabz40y3k3n8
+  Managers: 1
+  Nodes: 4
+  Default Address Pool: 10.0.0.0/8  
+  SubnetSize: 24
+  Data Path Port: 4789
+  [...]
+----
+
+
+Pour redonder le manager il faut s'ajouter dans cluster comme noeud manager secondaire pour rendre possible l'execution des commandes en local (le poste de dev en fait) et non devoir les executer sur le manger en remote.
+
+Sur le poste de dev, on execute la commande d'ajout d'un noeud classique:
+
+  docker swarm join --token SWMTKN-1-<token-value> 192.168.0.60:2377
+
+Et sur la machine manager on realise une promotion a la machine de dev (dev etant le nom hostname de la machine):
+
+  docker node promote dev
+
+Pour obtenir des informations sur les noeuds:
+
+  $ docker node ls
+  ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+  tntgi3hb72z9ly8rgir8p1j9p *   manager            Ready               Active              Leader              19.03.6
+  xbaxr3icsfc08a3liv4dr3v7p     node1              Ready               Active                                  19.03.8
+  fyvyl153mrly3jz12xt0bblb3     node2              Ready               Active                                  19.03.8
+  vgqfp4qxuguma7u11ghyw847i     node3              Ready               Active                                  19.03.8
+  s4h7oyar5tnothrwp0p6ukews *   dev                Ready               Active              Reachable           19.03.5
+
+
+Cool! Maintenant que le cluster swarm est monté, il ne reste qu'a deployer le service http.
+
+En preparation et pour respecter la typologie a venir, on va ajouter un label a nos noeuds [add-label]. Nous verons plus tard pourquoi et comment cela va impacter le deploiement.
+
+  docker node update --label-add http=active manager
+  docker node update --label-add http=active node1
+
+== Deploiement d'un service dans le swarm
+
+=== Process
+
+Pour deploier nos service nginx, on va definir un ficheir docker-compose un peu booster et integrant quelques specifications supplementaire [deploy-swarm].
+
+  tc-ngnix:
+    image: nginx:1.17.2-alpine
+    volumes:
+      - "/media/nfs_storage/tc-nginx/conf:/etc/nginx:ro"
+      - "/mnt/raid/data:/usr/share/nginx/html/data:ro"
+    ports:
+      - 80:80
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - "node.labels.http==active"
+
+Ce fichier va s'appuyer sur une image nginx evidemement, declarer les points de montage de conf et de data et definir :
+
+* le nombre de replicas c'est a dire le nombre d'instance souhaité du container
+* la strategie de placement via une contrainte permetant de n'utiliser que les nodes sur lesquels on a mis le label http
+
+Pour deployer le service http-services (son petit nom a nous):
+
+  docker stack deploy --compose-file docker-compose.yml http-services
+
+Pour consulter le service:
+
+  $ docker stack services http-services
+  ID                  NAME                        MODE                REPLICAS            IMAGE                               PORTS
+  d0g78u03joll        tc-infra-base_tc-ngnix      replicated          2/2                 nginx:1.17.2-alpine   *:80->80/tcp
+
+Nous dit que nous avons bien deployer nos instances. Pour savoir ou? nous allons demander directement a docker avec un docker ps sur le manager:
+
+  $ docker ps -a
+  CONTAINER ID        IMAGE                          COMMAND                  CREATED              STATUS                      PORTS               NAMES
+  e7e989c8b5f5        nginx:1.17.2-alpine            "nginx -g 'daemon of…"   About a minute ago   Up About a minute           80/tcp              http-services_tc-ngnix.1.xjww2x4g3ic3fs0h156vxneg0
+
+Il en manque un! mais non il est sur le node1:
+
+  $ docker ps -a
+  CONTAINER ID        IMAGE                          COMMAND                  CREATED              STATUS                      PORTS               NAMES
+  a1e06407c418        nginx:1.17.2-alpine            "nginx -g 'daemon of…"   About a minute ago   Up About a minute           80/tcp              http-services_tc-ngnix.2.ej3w74okhms3ir3gufbnockz7
+
+Le plus simpa avec ca du coup c'est que notre server est accessible que ce soit:
+
+* http://node1 
+* http://manager
+
+mais aussi en:
+
+* http://dev 
+* http://node2
+* http://node3
+
+Parfait nous voila avec un server nginx up en double instance, loadbalancé et accessible via tous les noeuds du cluster!
+
+=== Point de vigilance
+
+Je n'entre pas dans le detail mais sur certains points quelques interrogation peuvent etre soulevé, concernant le partage de la conf et des datas a nginx via un point de montage [nfs]. Ce n'est pas une solution ideale mais elle a le merite d'etre rapide et simple a mettre en oeuvre mais attention alors a la securité....
+
+=== Pour aller un peu plus loin...
+
+Pour voir un exemple similaire avec quelques manip en plus genre la mise a jour a chaud ou le scaling horizontal aller voir cet article [swarm-fun]
+
+Ensuite si vous voulez entrer dans la partie monitoring de vos containeurs et service avec des outils comme Prometheus ou Grafana, vous pouvez consulter [swarm-monitoring]
+
+== References
+
+* [docker-swarm-concepts] https://docs.docker.com/engine/swarm/key-concepts/
+* [docker-swarm] https://docs.docker.com/engine/swarm/
+* [create-swarm] https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/
+* [deploy-swarm] https://docs.docker.com/engine/swarm/stack-deploy/
+* [swarm-mode] https://docs.docker.com/engine/swarm/how-swarm-mode-works/services/#replicated-and-global-services
+* [add-label] https://docs.docker.com/engine/reference/commandline/node_update/#add-label-metadata-to-a-node
+* [docker] https://docs.docker.com/
+* [docker-compose] https://docs.docker.com/compose/
+* [nfs] https://doc.ubuntu-fr.org/nfs
+* [nginx] https://www.nginx.com/
+* [swarm-fun] https://dzone.com/articles/fun-with-docker-swarm?edition=334876&utm_source=Daily%20Digest&utm_medium=email&utm_campaign=Daily%20Digest%202017-11-15
+* [swarm-monitoring] https://dzone.com/articles/monitoring-docker-swarm?edition=451233&utm_source=Daily%20Digest&utm_medium=email&utm_campaign=Daily%20Digest%202019-02-11
