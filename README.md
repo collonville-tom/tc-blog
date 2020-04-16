@@ -17,6 +17,7 @@ Versions articles:
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-que-faire-avec-un-neurone-0.2.0/quefaireavecunneurone.html
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-raid-article-0.1.0/raid.html
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-samhain-article-0.1.0/samhain.html
-* * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-docker-swarm-article-0.1.0/docker-swarm.html
+* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-docker-swarm-article-0.1.0/docker-swarm.html
+* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/networking-adressage-0.1.0/networking-adressage.html
 
 Concerne aussi des developpements standard (Java, Liquibase, SGBD, etc...)

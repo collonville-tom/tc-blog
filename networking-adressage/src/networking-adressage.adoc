@@ -1,0 +1,198 @@
+= Networking : l'adressage                           
+Collonville Thomas                                     
+Version 0.1.0, --/--/2020                                              
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+:sectnums:                                                          
+:toc:                                                           
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de présentation de networking-adressage                              
+:keywords: networking-adressage                                                 
+:imagesdir: ./img       
+:source-highlighter: pygments
+:pygments-style: emacs
+:icons: font
+:nofooter:
+
+ifeval::["{backend}"=="html5"]
+:article:
+endif::[]
+ifeval::["{backend}"=="pdf"]
+:article:
+endif::[]
+ifeval::["{backend}"=="revealjs"]
+:presentation:
+endif::[]
+
+
+
+== Introduction
+
+Souvent je me dis qu'avoir un article récapitulatif des principes sous-jacents aux outils réseaux ne serait pas un luxe car on est régulièrement confronté à manipuler des flux entre des VM ou des conteneurs et parfois avoir les bon outils et bonnes connaissances pour bidouiller c'est pas de trop, (et ceux ayant lu les articles sur Iptable seront de mon avis, je pense ...) Surtout que par expérience on oublie vite! Pour avoir fait pas mal de réseau à une époque aujourd'hui j'ai un peu l'impression d'en avoir oublié la moitié.
+
+Donc avec cet article, on va essayer de refaire un tour des concepts principaux du networking, une adresse, un masque, un réseau, un bridge, un dns ou dhcp, on va essayer de revoir un peu tout ça avec les outils permettant de les mettre en oeuvre. 
+
+Bon je ne garanti pas que ça se fera qu'en un seul article....
+
+== Concepts principaux
+
+=== Réseau
+
+Un réseau, déjà qu'est ce que c'est? C'est tout simplement un ensemble de machines interconnectées. Bon jusque la je ne prend personne en traite. Seulement pour que ces machine communique entres elles, il est nécessaire qu'elles puissent s'identifier, c'est la que va intervenir l'adressage. 
+
+Pour ceux à qui OSI parle, nous nous trouvons alors dans la couche 3 celle que l'on nomme (étrangement) la couche réseau. A partir d'ici on évoluera assez peu dans les couches supérieur qui correspondent aux couches protocoles de transport et qui sont plus d'ordre logiciel. Par contre dans les couches inférieurs, nous trouverons le support de l'interconnexion réseau: l'interface réseau (identifiable matériellement par une adresse mac, celle ci est propre à l'interface) qui représente matériellement ou virtuellement le point de connections de la machine avec le ou les réseaux. Dans ce réseau, alors l'interface sera identifié via une adresse qui lui sera assignée, entre autre une adresse IP.
+
+Quoi deux adresses? pourquoi une adresse mac et une adresse IP? Il faut se dire que les deux types d'adresses ne servent pas à la même chose. La premier sert à identifier physiquement une interface et donc une machine, pas la localiser alors que l'IP (nous le verrons plus tard) permet aussi la localisation de le cette machine dans le réseau. D'autre part, pour une même interface, il n'est pas exclu que celle ci puisse être dans deux réseaux différents. Ainsi, elle aura deux IP mais toujours qu'une adresse mac. Nous verrons plus en détails cela par la suite.
+
+De façon général donc un réseau cela va être un espace sur lequel seront connecté des machines portant une adresse mac et une ou plusieurs adresses IP
+
+image::Interco-reseau.png[Un réseau logique]
+
+Mais pour que cela soit plus concret, on peut représenter cela avec un routeur qui aura la charge d'enregistrer les machines connectées sur le réseau et de leur permettre d'interagir entre elles (un switch pourra faire globalement le même taff, au broadcast prés...).
+
+image::Interco-reseau-phy.png[Un réseau physique]
+
+Si l'on peut faire une analogie, lorsque vous souhaitez envoyer un courrier à la poste, vous envoyez votre avec l'adresse du destinataire et la poste (ici le routeur) se charge de pousser ce message dans la bonne direction et au bon endroit.
+
+Bon voila nous avons vu l'essentiel! non je rigole, enfin quoique car finalement il ne s'agit que de ça, du routage de ce que l'on appelle paquet.
+
+=== IP
+
+Mais non quand même pas c'est pas si simple. Car plein de question devrait arriver: 
+* comment les machines s'identifient dans le réseau ? 
+* comment sont définis les IP, qui les donne ?
+* comment définir des réseaux différents sans prendre le risque qu'ils puissent se parler ?
+* pourquoi les IP sont construites sur 4 digits? 
+* etc...
+
+On va essayer de répondre à tout ça en entrant plus dans le détail de ce qu'est une IP. 
+
+On vient de le dire finalement, une IP c'est une adresse encodé sur 4 digits, en fait c'est ce que l'on appelle une IPv4. Vous en avez sûrement entendu parler, il existe aussi des IPv6, la différence est les nombre d'adresse que l'on va pouvoir construire avec les digits mais globalement c'est transposable. On gardera quand même nos explications sur IPv4, car nous allons le voir ça sera plus simple "visuellement".
+
+Donc une IP (IPv4) c'est 4 digit allant de 0 à 255. Par exemple, 192.168.0.10 est une IPv4. De cette façon, on va pouvoir construire 4 milliards d'adresses... (ça fait beaucoup mais... en fait aujourd'hui ça pose problème: pc + serveurs + Iot etc... en fait on les a exploser d'où l'apparition de IPv6 mais c'est une autre histoire)
+
+Par contre on s'est rendu compte que l'on ne pouvait pas considérer que l'on puisse adresse tout internet sur la base brute de ces 4 milliard d'adresses possibles. D'une part, à gérer cela aurait été trop gros et d'autre par, il est apparu important de pouvoir segmenter les réseaux, de façon à les isoler. Différentes topologie ont donc du être considéré: les petits réseaux qui finalement n'avait pas besoin de beaucoup d'adresse possible et les grands pour qui c'est l'inverse.
+
+On a donc créer des classes de réseaux identifiables via du masquage d'adresse.
+
+=== Masquage réseau
+
+Le masquage consiste à définir un pattern permettant de contextualiser une adresse IP. En utilisant un masque, l'adresse fournira alors deux type d'information, celle identifiant la machine, et celle identifiant le plan d'adressage du réseau dans lequel cette machine se trouve.
+
+Par exemple, considérons l'IP : 192.168.0.25. En l'état la seul chose que l'on puisse dire c'est qu'il n'existe d'un réseau et cette IP est associé à la machine numéro 192.168.0.25.
+
+Pas contre l'utilisation d'un masque spécifiant par exemple 255.255.255.0 (/24). Nous permet de dire qu'en fait cette machine fait parti du réseau 192.168.0.0 et qu'elle est la machine numéro 25.
+
+La notion de masque à été standardisé au travers des classes A,B,C,D et E... [classe-IP] Ici nous ne nous y intéresserons pas.
+
+Le principe du masquage nous permet ici d'avoir un réseau restreint contenant que 255 machine possible. L'intérêt par contre est que ce plan d'adressage en 192.168.0.0 est réutilisable dans un autre réseau qui serait isolé et indépendant de celui-ci car aucune des machines ne pourrait se connaître et on pourrait alors avoir dans chacun de ces deux réseaux une machine portant la mémé adresse. Comme ci dessous.
+
+Ici on a deux réseaux avec un plan d'adressage identique mais qui sont interconnectés via un troisième réseau qui lui les identifie dans un plan d'adressage diffèrent (on y viendra mais alors il faudra penser à utiliser des routeurs afin de permettre à toutes ces machines de parler entre elle, on verra cela lors du routage).
+
+image::segmentation-reseau-par-masquage.png[Masquage et segmentation]
+
+Un autre solution à la topologie précédente est d'utiliser un sous masque réseau sur la base d'un masque réseau plus large. Ainsi on crée des réseaux dans le plan d'adressage initial permettant d'avoir une décomposition logique et minimiser le nombre de routeurs à déployer
+
+image::segmentation-reseau-par-sousmasquage.png[Sous Masquage et segmentation]
+
+== Exemple
+
+C'est bien tout ça mais dans la vraie vie  comme ça se présente? Pour faire simple, et visualiser cela depuis sa machine, deux outils peuvent être employé.
+
+Le très célèbre ifconfig (ipconfig sous windows) [ifconfig] qui nous restituera l'ensemble des interfaces de notre machine avec les informations dont nous venons de parler:
+
+.IfConfig
+[source,bash,linenums]
+----
+$ ifconfig
+eno2: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.57  netmask 255.255.255.0  broadcast 192.168.0.255
+        ether 04:56:26:1d:b2:96  txqueuelen 1000  (Ethernet)
+        RX packets 8229590  bytes 7371495080 (7.3 GB)
+        RX errors 0  dropped 184  overruns 0  frame 0
+        TX packets 7627831  bytes 1670924458 (1.6 GB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        loop  txqueuelen 1000  (Boucle locale)
+        RX packets 459205  bytes 108586619 (108.5 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 459205  bytes 108586619 (108.5 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlo1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.43  netmask 255.255.255.0  broadcast 192.168.0.255
+        ether 48:14:7f:86:2e:69  txqueuelen 1000  (Ethernet)
+        RX packets 148857  bytes 23021004 (23.0 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 48859  bytes 5284481 (5.2 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+----
+
+On y retrouve l'interface filaire _eno2_ et l'interface wifi _wlo1_. A noter _lo_ qui est ce que l'on appelle la loopback qui est en _127.0.0.1_ qui permet à la machine de se parler à elle même sans préjuger du réseau dans lequel elle se trouve.
+
+L'autre outil est plus récent que ifconfig il s'agit de ip [ip-tool], un outil générique pour la manipulation des concepts réseaux, nous reviendrons souvent dessus.
+
+.IfConfig
+[source,bash,linenums]
+----
+$ ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 04:92:26:de:b2:e8 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.57/24 brd 192.168.0.255 scope global dynamic noprefixroute eno2
+       valid_lft 32728sec preferred_lft 32728sec
+3: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 48:de:7f:09:2e:69 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.43/24 brd 192.168.0.255 scope global dynamic noprefixroute wlo1
+       valid_lft 37450sec preferred_lft 37450sec
+----
+
+Enfin , maintenant que nos machines sont identifiables dans le réseau, il va falloir définir comment leur donner ces adresses!
+
+== DHCP, passerelle et DNS
+
+La ça va être le rôle du DHCP (Dynamic Host Configuration Protocole) [dhcp]. En effet, il est toujours possible d'allouer une adresse ip manuellement à une machine typiquement on ferai comme ceci:
+
+.Ip manuelle
+[source,bash,linenums]
+----
+$ sudo ip addr del 192.168.0.125 dev eno2
+----
+
+Mais honnêtement si votre parc de machine ou serveur comporte 200 équipements réseaux dont la plupart ont des interfaces réseaux redonnées, alors je vous souhaite bien du courage!
+
+Non le plus simple est de déléguer ça à un gestionnaire d'adresse réseaux qu'est le DHCP. Ainsi lorsqu'une machine n'a pas d'IP, elle va aller en demander une en broadcastant une requête sur le réseaux. Le serveur DHCP va y répondre et lui allouer une ip (parmi celle disponible en fonction de l'adresse réseau, du masque et des adresses déjà allouées) mais aussi lui donner l'adresse de la passerelle par défaut et l'adresse du DNS.
+
+Ou-la, qu'est ce que c'est que ça encore! Oui nous n'en avons pas encore parler mais une machine du réseaux, si elle souhaite parler à une autre machine du même réseau, alors pas de soucis, le routage des paquets est direct. Par contre si cette machine est en dehors du réseau alors, il faudra qu'elle s'adresse à la _passerelle_ pour que celle ci puisse relayer les messages vers un réseau plus compétant dans la résolution de l'IP (qui lui même fera pareil le cas échéant)... il s'agit du même mécanisme que celui que nous avions évoqué dans l'article sur Iptable et le routage [iptable].
+
+Ce qu'il faut retenir c'est qu'une passerelle c'est comme votre box internet, quand vous allez sur internet ça passe par elle (elle a donc une ip dans votre réseau) et quand les réponses reviennent, cela passe par une ip externe qu'elle expose de façon à être identifié dans le réseau externe.
+
+De même un serveur DNS est un serveur chargé de résoudre les noms de domaine et de machine et vous les traduire en adresse IP pour que vous puissiez contacter la machine en question.
+
+image::dns-et-passerelle.png[DNS et Passerelle]
+
+Ainsi par exemple, vous voulez accéder au site www.google.fr . Ceci est un nom de domaine, pas une ip, donc vous allez devoir vous adresser au serveur DNS que le serveur DHCP. Ce que vous avez du DNS c'est son adresse IP et celle ci est un autre réseau que vous. Vous allez don envoyer votre requête à la passerelle qui poussera la demande au DNS. Le DNS répondra alors à la passerelle qui vous retransmettra le message Comportant l'IP du site web de google. Pour l'interroger, rebelotte, la requête est envoyé à la passerelle (oui je doute que votre réseau local contienne les serveur de google) qui la renverra sur l'IP de chez google.
+
+A noter, que l'IP de google est probablement d'une passerelle également et que ses flux sont envoyé en interne dans d'autre sous réseau dont on a pas connaissance.
+
+== Conclusion
+
+Voila, nous avons vu l'essentiel du réseau, les IP, les masques, quelques notions de routage et de résolutions de nom. Maintenant nous allons pouvoir aborder des choses plus intéressants: les réseaux virtuels et les bridges
+
+== Références
+
+* [iptable] https://un-est-tout-et-tout-est-un.blogspot.com/2019/10/reseau-iptables-routeur-logiciel.html
+* [OSI] https://fr.wikipedia.org/wiki/Mod%C3%A8le_OSI
+* [classe-IP] https://fr.wikipedia.org/wiki/Classe_d%27adresse_IP
+* [ifconfig] https://wiki.debian.org/fr/NetworkConfiguration
+* [ip-tool] https://memo-linux.com/ip-la-commande-linux-pour-gerer-son-interface-reseau/
+* [dhcp] https://fr.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol
+* [dns] https://fr.wikipedia.org/wiki/Domain_Name_System
