@@ -19,5 +19,6 @@ Versions articles:
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-samhain-article-0.1.0/samhain.html
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-docker-swarm-article-0.1.0/docker-swarm.html
 * https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-networking-adressage-article-0.1.0/networking-adressage.html
+* https://collonville-tom.github.io/tc-un-est-tout-et-tout-est-un/sites/tc-Network-VM-IaC-article-0.1.0/Network-VM-IaC.html
 
 Concerne aussi des developpements standard (Java, Liquibase, SGBD, etc...)

@@ -1,0 +1,260 @@
+= Network, VM et IaC (Vagrant)                            
+Collonville Thomas                                     
+Version 0.1.0, --/--/2020                                              
+
+[quote, Robert Heinlein]
+When one teach, two learn
+
+:sectnums:                                                          
+:toc:                                                           
+:toclevels: 4                                                       
+:toc-title: Plan                                              
+:description: Document de presentation de Network, VM et IaC                              
+:keywords: Network, VM et IaC                                                 
+:imagesdir: ./img       
+:source-highlighter: pygments
+:pygments-style: emacs
+:icons: font
+:nofooter:
+
+ifeval::["{backend}"=="html5"]
+:article:
+endif::[]
+ifeval::["{backend}"=="pdf"]
+:article:
+endif::[]
+ifeval::["{backend}"=="revealjs"]
+:presentation:
+endif::[]
+
+
+== Introduction
+
+
+ifdef::article[]
+
+Qui n'a jamais eut besoin de faire des tests dans un environnement sain et isolé du poste de développement? Personne je crois en tout cas si ce n'est pas le cas, vous y viendrais un jour, c'est sur car à un moment et si vous utiliser pas Docker, il va falloir confronter vos exe à l'environnement d'exécution de la Prod! 
+
+Deux approches s'offrent généralement:
+* bénéficier d'un environnement de test dédié, c'est à dire avoir une machine physique [bare-metal], pré-installé comme en prod sur laquelle il est possible de déployer votre application et exécuter des tests dessus. on se doute que cette approche est coûteuse en matériel et en maintenance (temps de nettoyage/ réinstallation des machine etc...)
+* utiliser des machines virtuelles [machine-virtuelle].
+
+endif::[]
+
+== La virtualisation
+
+ifdef::article[]
+
+Cette deuxième approche [machine-virtuelle], que nous allons un peu plus détailler, offre de nombreux avantages car elle virtualise d'une part le matériel, donc pas de ressources physiques à gérer mais elle permet de disposer d'environnement iso, reutilisable, ajustable et jetable rapidement. On pourra du coup evoquer bien sur le cas extreme de cette demarche par l'utilisation de Docker [Docker]. Pourtant il est important de ne pas confondre les deux outils et leurs objectifs respectifs. Le containeur isole un processus, une machine virtuelle isole un environnement. Cette dichotomie est importante car elle pousse à reflechir à ce que l'on souhaite mettre en oeuvre et pas faire un choix dogmatiquement.
+
+Ainsi pour en revenir aux machines virtuelles, leur interet est donc par l'abstraction de l'environement d'execution de permettre de disposer à la demande de cet environement dans un etat de configuration maitrisé.
+
+Jusque ici l'utilisation des machines passe generalement par le choix d'un hyperviseur, en gros une couche logicielle permettant d'alouer sur la stack physique de l'OS de la machine des resources simulées. Cette demarche permet de creer des CPU virtuelle, de la memoire vituelle, du stockage virtuel ou meme encore du reseau vituel (nous reviendrons sur cette partie dans un autre article car c'est un sujet en soit).
+
+L'inconveniant de l'utilisation d'un superviseur, c'est qu'il faut faire un choix. Selon le systeme d'exploitation qui est utiliser, on ne disposera pas des memes. De facon general, on notera malgré tout que l'offre est riche: qemu-KVM/libvirt [qemu], [virtualbox], hyper-v [hyper-v] ou encore vmware sont les plus connu. Pourtant et malgré des années d'existance, ces derniers n'offrent toujours pas d'API homogenes rendant leur utilisation au sein d'un meme contexte compliqué car il faudra alors prendre en consideration les specificités de chacun d'eux.
+
+Ainsi non seulement, souvent ces machines sont utilisé à la main mais lorsqu'il s'agit de gerer logiciellement le cycle de vie des VM et l'automatiser dans une demarche IaC (infrastructure as à code [IaC]), alors il faudra se limiter. Le quoi? l'IaC? Ce n'est pas important, nous y reviendrons!
+
+endif::[]
+
+== Vagrant
+
+Une solution est pourtant possible! Vagrant [vagrant]! Bon ce n'est pas une solution miracle, mais en terme de provisionning de machine virtuel, cet outil permet d'abstraire bon nombre de caracteristique propres aux hyperviseurs (en dehors de son choix propre mais cela reste variabilisable).
+
+Vagrant à surtout pour interet d'etre extremement simple d'emploi pour des actions basiques sur le cycle de vie d'une VM. En gros construire la VM, la lancer, l'arreter, ou encore la detruire se realise en juste quelques commandes. Bien sur qu'il permet d'ee faire plus mais globalement ca sera pour des utilisations en marge de celle utile au quotidien.
+
+Ainsi pour realiser une VM, il va falloir en premier lieu la definir. Pour cela, on va realiser un fichier vagrantfile. Ce fichier s'appuie sur le language Ruby. sans etre un grand expert de Ruby, en fait ce fichier va etre essentiellement descriptif: Il va contenir un bloc "do" permettant de specifier la version vagrant utilisé. Dans ce bloc il va ensuite falloir decrire la VM en specifiant 
+* son image de base qui sera issu d'une bibliotheque d'image hebergé par vagrant [vagrant-images]. 
+* un nom qui servira de hostname,
+* une config reseau selon 3 modes possibles: 
+** en port mapping permettant de router les paquet arrivant sur un port de la machine hote sur un port de la machine virtuelle
+** avec un reseau privé, c'est à dire qu'un reseau virtuel sera construit dans laquelle la machine virtuelle aura une adressse IP. Ce reseau sera accessible alors par la machine hote et seulement celle ci (la machine host disposera alors d'un nouvelle interface avec une IP dans le reseau virtuel)
+** avec un reseau publique, c'est à dire qu'une interface sera creer dans la machine virtuelle mais celle ci sera bridgé sur la machine hote dans le meme reseau que celle ci.
+* un provider c'est à dire l'hyperviseur employé, et on pourra alors preciser le nombre de CPU virtuel et de memoire que l'on souhaite lui allouer.
+
+Pour exemple, voici une allocation de VM possible:
+
+.vagrantFile
+[source,ruby,linenums]
+----
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu1804"
+  config.vm.hostname = "myvmtest"
+  config.vm.network "public_network", :dev => "eno2", :mode => 'bridge', mac: "52:54:00:B2:14:8E", use_dhcp_assigned_default_route: true
+  config.vm.provider "libvirt" do |vb|
+    vb.memory = "1000"
+    vb.cpus = "1"
+  end
+end
+----
+
+Pour lancer cette VM, rien de plus simple:
+
+.Provisionning et demarrage de la VM
+[source,shell,linenums]
+----
+$ vagrant up
+Bringing machine 'default' up with 'libvirt' provider...
+==> default: Checking if box 'generic/ubuntu1804' is up to date...
+==> default: Creating image (snapshot of base box volume).
+==> default: Creating domain with the following settings...
+==> default:  -- Name:              vagrant-template_default
+==> default:  -- Domain type:       kvm
+==> default:  -- Cpus:              1
+==> default: 
+==> default:  -- Feature:           acpi
+==> default:  -- Feature:           apic
+==> default:  -- Feature:           pae
+==> default:  -- Memory:            1000M
+==> default:  -- Management MAC:    
+==> default:  -- Loader:            
+==> default:  -- Base box:          generic/ubuntu1804
+==> default:  -- Storage pool:      default
+==> default:  -- Image:             /var/lib/libvirt/images/vagrant-template_default.img (32G)
+==> default:  -- Volume Cache:      default
+==> default:  -- Kernel:            
+==> default:  -- Initrd:            
+==> default:  -- Graphics Type:     vnc
+==> default:  -- Graphics Port:     -1
+==> default:  -- Graphics IP:       127.0.0.1
+==> default:  -- Graphics Password: Not defined
+==> default:  -- Video Type:        cirrus
+==> default:  -- Video VRAM:        256
+==> default:  -- Sound Type:
+==> default:  -- Keymap:            en-us
+==> default:  -- TPM Path:          
+==> default:  -- INPUT:             type=mouse, bus=ps2
+==> default: Creating shared folders metadata...
+==> default: Starting domain.
+==> default: Waiting for domain to get an IP address...
+==> default: Waiting for SSH to become available...
+    default: 
+    default: Vagrant insecure key detected. Vagrant will automatically replace
+    default: this with a newly generated keypair for better security.
+    default: 
+    default: Inserting generated public key within guest...
+    default: Removing insecure key from the guest if it's present...
+    default: Key inserted! Disconnecting and reconnecting using new SSH key...
+==> default: Setting hostname...
+==> default: Configuring and enabling network interfaces...
+----
+
+Cela va avoir pour consequence de provisionner la VM les ressources, faire l'allocation de l'IP via le DHCP et de fournir une interface en plus pour la maintenance.
+
+== Networking
+
+Aisni, du coté host, on a un certain nombre d'interfaces reseaux "mysterieuse" qui ont ete crée, virbr0, vnet, macvtap0@eno2 on va revenir dessus:
+
+.Interface reseaux host
+[source,shell,linenums]
+----
+$ ip a
+1: lo: [...]
+2: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 04:92:26:1d:b2:e8 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.57/24 brd 192.168.0.255 scope global dynamic noprefixroute eno2
+       valid_lft 36031sec preferred_lft 36031sec
+3: wlo1: [...]
+41: virbr0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 52:54:00:d7:c3:3c brd ff:ff:ff:ff:ff:ff
+    inet 192.168.121.1/24 brd 192.168.121.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+42: virbr0-nic: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel master virbr0 state DOWN group default qlen 1000
+    link/ether 52:54:00:d7:c3:3c brd ff:ff:ff:ff:ff:ff
+71: vnet0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master virbr0 state UNKNOWN group default qlen 1000
+    link/ether fe:54:00:51:d8:29 brd ff:ff:ff:ff:ff:ff
+72: macvtap0@eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 500
+    link/ether 52:54:00:b2:14:8e brd ff:ff:ff:ff:ff:ff
+----
+
+Mais dans la VM, on a que deux interfaces:
+
+.Interface reseaux VM
+[source,shell,linenums]
+----
+$ vagrant ssh 
+$ ip a
+1: lo: [...]
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 52:54:00:51:d8:29 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.121.245/24 brd 192.168.121.255 scope global dynamic eth0
+       valid_lft 1943sec preferred_lft 1943sec
+3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 52:54:00:b2:14:8e brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.110/24 brd 192.168.0.255 scope global dynamic eth1
+       valid_lft 41543sec preferred_lft 41543sec
+----
+
+Pour expliquer un peu tout cela. Lors de la creation de la VM, vagrant va construire 2 interfaces, l'une pour la maintenance est utilisée lorsque l'on realise "vagrant ssh" (eth0) et l'autre est celle qu'on lui a demandé de creer dans le vagrantfile (eth0).
+
+Du coté du host c'est un peu plus compliqué. On sait que l'interface que nous avons demandé de constuire à vagrant est une interface public mais par defaut, celle qu'il construit pour lui, ou celle de maintenance, est une interface privé. 
+
+On a donc deux approches differentes et forcement deux solutions (avant cela, je vous invite à aller relire l'article sur l'adressage [addressage], ca peut aider).
+
+=== Reseau Privé
+
+Pour les reseau privé, vagrant va constuire un network virtuel. Pour cela il va creer une interface associé present dans la VM (ici vnet0), de meme, il va creer une interface pour le host (ici virbr0-nic). Enfin, vagrant va construire un bridge [bridge] (ici virbr0) ou pont permettant d'alluer une ip au host, dans un plan d'addressage specifique. 
+
+C'est cette manipualtion qui va permettre la creation de ce reseau privé entre le host et la machien virtuelle permettant aux deux de communiquer ensemble. On peu le verifier en utilisant les commande suivante:
+
+.Bridge pour reseau virtuel privé
+[source,shell,linenums]
+----
+$ brctl show 
+bridge name	bridge id		STP enabled	interfaces
+virbr0		8000.525400d7c33c	yes		virbr0-nic
+							vnet0
+----
+
+La commande brctl n'etant plus officiellement supporté sous certains OS, l'alternative est:
+
+.Bridge pour reseau virtuel privé
+[source,shell,linenums]
+----
+$ ip link show type bridge_slave
+42: virbr0-nic: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel master virbr0 state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:d7:c3:3c brd ff:ff:ff:ff:ff:ff
+73: vnet0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master virbr0 state UNKNOWN mode DEFAULT group default qlen 1000
+    link/ether fe:54:00:20:a2:a1 brd ff:ff:ff:ff:ff:ff
+$ ip link show type bridge
+41: virbr0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:d7:c3:3c brd ff:ff:ff:ff:ff:ff
+----
+
+=== Reseau Publique
+
+Concernant l'interface publique, c'est plus simple car il existe deja une interface dans le reseau public, c'est eno2. Du coup au lieu de construire un bridge comme precedement, ici dans le host, vagrant va en construire une autre sorte, le macvtap, entre l'interface reseau de la VM identifié par son adresse mac (qui sera alors transposé sur le macvtap) et l'interface en02 de la machine host.
+
+On peut le voir grace à la commande suivante:
+
+.Bridge pour reseau virtuel publique
+[source,shell,linenums]
+----
+ip link show type macvtap
+74: macvtap0@eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 500
+    link/ether 52:54:00:b2:14:8e brd ff:ff:ff:ff:ff:ff
+----
+
+L'interet ici contrairement à l'interface public, c'est que l'adresse mac de la VM est visible depuis le reseau publique et donc qu'elle peut etre gerer par un service DHCP.
+
+En resumé, tout cela donne le reseau suivant:
+
+image::VM-net.png[Un réseau virtuel]
+
+Il y aurait encore beaucoup à dire sur les aspects reseaux (le vlan par exemple, etc..) ou sur vagrant qui par le biais de plugin va permettre le provision automatique du contenu logiciel de la VM ainsi creer (via Ansible par exemple). Ceci est un autre probleme que nous traiterons dans d'autres articles.
+
+== Références
+
+* [bare-metal] https://www.ionos.fr/digitalguide/serveur/know-how/serveur-bare-metal-definition-et-structure/
+* [machine-virtuelle] https://fr.wikipedia.org/wiki/Machine_virtuelle
+* [Docker] https://www.docker.com/
+* [qemu] https://www.qemu.org/
+* [virtualbox] https://www.virtualbox.org/
+* [hyper-v] https://docs.microsoft.com/fr-fr/virtualization/hyper-v-on-windows/about/
+* [vmware] https://www.vmware.com/fr.html
+* [IaC] https://www.lebigdata.fr/infrastructure-as-code-definition
+* [vagrant] https://www.vagrantup.com 
+* [vagrant-images] https://app.vagrantup.com/boxes/search
+* [ip-addr] https://memo-linux.com/ip-la-commande-linux-pour-gerer-son-interface-reseau/
+* [addressage] https://un-est-tout-et-tout-est-un.blogspot.com/2020/04/networking-adressage.html
+* [bridge] https://seravo.fi/2012/virtualized-bridged-networking-with-macvtap
