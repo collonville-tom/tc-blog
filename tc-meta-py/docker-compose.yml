@@ -1,0 +1,10 @@
+version: '3'
+services:
+  restool:
+    image: collonvtom/meta-rest:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    restart: always

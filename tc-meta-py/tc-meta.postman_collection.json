@@ -1,0 +1,504 @@
+{
+	"info": {
+		"_postman_id": "2ae9d34a-a120-4c34-a836-7e770bc52862",
+		"name": "tc-meta",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET M2 Object",
+			"item": [
+				{
+					"name": "List",
+					"item": [
+						{
+							"name": "GET M2 List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5001/m2",
+									"protocol": "http",
+									"host": [
+										"host",
+										"docker"
+									],
+									"port": "5001",
+									"path": [
+										"m2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET EntityType List",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5001/m2/MyMM/entityType",
+									"protocol": "http",
+									"host": [
+										"host",
+										"docker"
+									],
+									"port": "5001",
+									"path": [
+										"m2",
+										"MyMM",
+										"entityType"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET RelationType List",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5001/m2/MyMM/relationType",
+									"protocol": "http",
+									"host": [
+										"host",
+										"docker"
+									],
+									"port": "5001",
+									"path": [
+										"m2",
+										"MyMM",
+										"relationType"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "GET MyMM",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyEntityType1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/entityType/MyEntityType1",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"entityType",
+								"MyEntityType1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyrelationType1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/relationType/MyrelationType1",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"relationType",
+								"MyrelationType1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GET M1 Object",
+			"item": [
+				{
+					"name": "List",
+					"item": [
+						{
+							"name": "GET M1 List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5001/m2/MyMM/m",
+									"protocol": "http",
+									"host": [
+										"host",
+										"docker"
+									],
+									"port": "5001",
+									"path": [
+										"m2",
+										"MyMM",
+										"m"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET MyModel Entity List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5001/m2/MyMM/m/MyModel/entity",
+									"protocol": "http",
+									"host": [
+										"host",
+										"docker"
+									],
+									"port": "5001",
+									"path": [
+										"m2",
+										"MyMM",
+										"m",
+										"MyModel",
+										"entity"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET MyModel Relation List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5001/m2/MyMM/m/MyModel/relation",
+									"protocol": "http",
+									"host": [
+										"host",
+										"docker"
+									],
+									"port": "5001",
+									"path": [
+										"m2",
+										"MyMM",
+										"m",
+										"MyModel",
+										"relation"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "GET MyEntityType1 entities",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/entityType/MyEntityType1/entity",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"entityType",
+								"MyEntityType1",
+								"entity"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyEntity4 via MyEntityType1 entities",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/entityType/MyEntityType1/entity/MyEntity4",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"entityType",
+								"MyEntityType1",
+								"entity",
+								"MyEntity4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyrelationType1 relations",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/relationType/MyrelationType1/relation",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"relationType",
+								"MyrelationType1",
+								"relation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyRelation1 via MyrelationType1 relations",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/relationType/MyrelationType1/relation/MyRelation1",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"relationType",
+								"MyrelationType1",
+								"relation",
+								"MyRelation1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyModel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/m/MyModel",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"m",
+								"MyModel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyRelation1 via MyModel Relation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/m/MyModel/relation/MyRelation1",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"m",
+								"MyModel",
+								"relation",
+								"MyRelation1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MyEntity1 via MyModel Entity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/m2/MyMM/m/MyModel/entity/MyEntity1",
+							"protocol": "http",
+							"host": [
+								"host",
+								"docker"
+							],
+							"port": "5001",
+							"path": [
+								"m2",
+								"MyMM",
+								"m",
+								"MyModel",
+								"entity",
+								"MyEntity1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
