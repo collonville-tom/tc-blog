@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/FSM/src" modelPluginID="FSM" modelName="FSM" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="5.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>fSM.ecore</foreignModel>
+  <genPackages prefix="FSM" disposableProviderFactory="true" ecorePackage="fSM.ecore#/">
+    <genClasses ecoreClass="fSM.ecore#//FSM">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference fSM.ecore#//FSM/state"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference fSM.ecore#//FSM/transition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference fSM.ecore#//FSM/event"/>
+    </genClasses>
+    <genClasses ecoreClass="fSM.ecore#//State"/>
+    <genClasses ecoreClass="fSM.ecore#//Transition">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference fSM.ecore#//Transition/in"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference fSM.ecore#//Transition/out"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference fSM.ecore#//Transition/event"/>
+    </genClasses>
+    <genClasses ecoreClass="fSM.ecore#//Event"/>
+    <genClasses ecoreClass="fSM.ecore#//NamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute fSM.ecore#//NamedElement/name"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

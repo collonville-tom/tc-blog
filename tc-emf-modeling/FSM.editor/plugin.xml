@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated fSM -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="fSM.presentation.FSMModelWizardID"
+            name="%_UI_FSMModelWizard_label"
+            class="fSM.presentation.FSMModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/FSMModelFile.gif">
+         <description>%_UI_FSMModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated fSM -->
+      <editor
+            id="fSM.presentation.FSMEditorID"
+            name="%_UI_FSMEditor_label"
+            icon="icons/full/obj16/FSMModelFile.gif"
+            extensions="fsm"
+            class="fSM.presentation.FSMEditor"
+            contributorClass="fSM.presentation.FSMActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>
